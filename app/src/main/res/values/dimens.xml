@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="card_item_padding">16dp</dimen>
+    <dimen name="card_item_image_size">64dp</dimen>
+    <dimen name="card_item_image_margin_end">12dp</dimen>
+    <dimen name="card_item_image_margin_bottom">12dp</dimen>
+    <dimen name="card_item_title">18sp</dimen>
+    <dimen name="card_item_title_margin_bottom">10dp</dimen>
+    <dimen name="card_item_desc">16sp</dimen>
+    <dimen name="card_item_count">14sp</dimen>
+
+    <dimen name="large_card_item_image_size">128dp</dimen>
+    <dimen name="large_card_item_image_mask_height">60dp</dimen>
+    <dimen name="large_card_item_title">22sp</dimen>
+
+    <dimen name="load_item_size">36dp</dimen>
+</resources>

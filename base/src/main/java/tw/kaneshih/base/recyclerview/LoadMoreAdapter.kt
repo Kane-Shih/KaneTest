@@ -2,7 +2,7 @@ package tw.kaneshih.base.recyclerview
 
 import android.support.v7.widget.RecyclerView
 
-abstract class LoadMoreAdapter<H : RecyclerView.ViewHolder, T> : RecyclerView.Adapter<H>() {
+abstract class LoadMoreAdapter<VH : RecyclerView.ViewHolder, in T> : RecyclerView.Adapter<VH>() {
 
     var isLoading: Boolean = false
         private set

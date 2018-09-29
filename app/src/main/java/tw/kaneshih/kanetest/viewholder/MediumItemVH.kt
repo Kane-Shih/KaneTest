@@ -6,7 +6,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import tw.kaneshih.base.viewholder.ViewHolder
 import tw.kaneshih.kanetest.R
-import tw.kaneshih.kanetest.card.model.Card
+import tw.kaneshih.kanetest.model.Card
 import tw.kaneshih.kanetest.glide.GlideApp
 
 class MediumItemVH(private val itemView: View,

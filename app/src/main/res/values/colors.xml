@@ -4,6 +4,6 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">@android:color/darker_gray</color>
 
-    <color name="card_item_count">@color/colorPrimary</color>
-    <color name="card_item_text_shadow">@android:color/darker_gray</color>
+    <color name="item_count">@color/colorPrimary</color>
+    <color name="text_shadow">@android:color/darker_gray</color>
 </resources>

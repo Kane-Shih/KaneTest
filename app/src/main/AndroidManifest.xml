@@ -13,7 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="tw.kaneshih.kanetest.card.ui.CardListActivity">
+        <activity android:name="tw.kaneshih.kanetest.ui.MixedListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

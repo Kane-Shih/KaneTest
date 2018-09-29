@@ -9,10 +9,10 @@
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@id/appTitle"
-    tools:context=".card.ui.CardListActivity">
+    tools:context=".ui.MixedListActivity">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/cardListView"
+        android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

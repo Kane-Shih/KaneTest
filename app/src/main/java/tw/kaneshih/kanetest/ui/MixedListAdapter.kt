@@ -1,4 +1,4 @@
-package tw.kaneshih.kanetest.card.ui
+package tw.kaneshih.kanetest.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -13,14 +13,14 @@ import tw.kaneshih.kanetest.viewholder.LargeItemViewModel
 import tw.kaneshih.kanetest.viewholder.MediumItemVH
 import tw.kaneshih.kanetest.viewholder.MediumItemViewModel
 
-class CardListAdapter(
+class MixedListAdapter(
         private val onItemClickListener: (itemViewModel: ItemViewModel) -> Unit,
         private val onItemThumbnailClickListener: (itemViewModel: ItemViewModel) -> Unit
 ) : LoadMoreAdapter<RecyclerVH<ItemViewModel>, ItemViewModel>() {
     companion object {
         const val VIEW_TYPE_LOADING = 0
-        const val VIEW_TYPE_CARD_LARGE = 1
-        const val VIEW_TYPE_CARD_MEDIUM = 2
+        const val VIEW_TYPE_LARGE_CENTERED = 1
+        const val VIEW_TYPE_MEDIUM_LEFT_IMAGE = 2
     }
 
     private val list = mutableListOf<ItemViewModel>()
@@ -44,23 +44,23 @@ class CardListAdapter(
             VIEW_TYPE_LOADING
         } else {
             when (list[position]) {
-                is MediumItemViewModel -> VIEW_TYPE_CARD_MEDIUM
-                is LargeItemViewModel -> VIEW_TYPE_CARD_LARGE
-                else -> VIEW_TYPE_CARD_MEDIUM
+                is MediumItemViewModel -> VIEW_TYPE_MEDIUM_LEFT_IMAGE
+                is LargeItemViewModel -> VIEW_TYPE_LARGE_CENTERED
+                else -> VIEW_TYPE_MEDIUM_LEFT_IMAGE
             }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerVH<ItemViewModel> {
         val vh = when (viewType) {
-            VIEW_TYPE_CARD_LARGE ->
+            VIEW_TYPE_LARGE_CENTERED ->
                 LargeItemVH(LayoutInflater.from(parent.context)
-                        .inflate(R.layout.item_card_large, parent, false),
+                        .inflate(R.layout.item_large_centered, parent, false),
                         onItemClickListener, onItemThumbnailClickListener)
 
-            VIEW_TYPE_CARD_MEDIUM ->
+            VIEW_TYPE_MEDIUM_LEFT_IMAGE ->
                 MediumItemVH(LayoutInflater.from(parent.context)
-                        .inflate(R.layout.item_card_medium, parent, false),
+                        .inflate(R.layout.item_medium_left_image, parent, false),
                         onItemClickListener, onItemThumbnailClickListener)
 
             else -> BasicVH<ItemViewModel>(LayoutInflater.from(parent.context)

@@ -1,4 +1,4 @@
-package tw.kaneshih.kanetest.card.model
+package tw.kaneshih.kanetest.model
 
 import org.json.JSONArray
 import org.json.JSONObject

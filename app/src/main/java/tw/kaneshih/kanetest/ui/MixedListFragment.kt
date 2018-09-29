@@ -1,4 +1,4 @@
-package tw.kaneshih.kanetest.card.ui
+package tw.kaneshih.kanetest.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,26 +10,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.core.widget.toast
-import kotlinx.android.synthetic.main.fragment_card_list.*
+import kotlinx.android.synthetic.main.layout_refresher_recyclerview.*
 import tw.kaneshih.base.logcat
 import tw.kaneshih.base.recyclerview.LoadMoreAdapter
 import tw.kaneshih.base.task.Result
 import tw.kaneshih.kanetest.R
-import tw.kaneshih.kanetest.card.model.Card
-import tw.kaneshih.kanetest.card.model.CardType
-import tw.kaneshih.kanetest.card.task.CardListFetcher
+import tw.kaneshih.kanetest.model.Card
+import tw.kaneshih.kanetest.model.CardType
+import tw.kaneshih.kanetest.task.CardListFetcher
 import tw.kaneshih.kanetest.viewholder.ItemViewModel
 import tw.kaneshih.kanetest.viewholder.LargeItemViewModel
 import tw.kaneshih.kanetest.viewholder.MediumItemViewModel
 import tw.kaneshih.kanetest.viewholder.toLargeItemViewModel
 import tw.kaneshih.kanetest.viewholder.toMediumItemViewModel
 
-class CardListFragment : Fragment() {
+class MixedListFragment : Fragment() {
     companion object {
         const val PAGE_COUNT = 20
         const val LOAD_MORE_THRESHOLD = 5
 
-        fun getInstance() = CardListFragment()
+        fun getInstance() = MixedListFragment()
     }
 
     private var canLoadMore = true
@@ -37,16 +37,16 @@ class CardListFragment : Fragment() {
     private lateinit var adapter: LoadMoreAdapter<*, ItemViewModel>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_card_list, container, false)
+        return inflater.inflate(R.layout.layout_refresher_recyclerview, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        cardListView.layoutManager = LinearLayoutManager(context)
-        cardListView.adapter = CardListAdapter(itemClickListener, itemThumbnailClickListener)
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.adapter = MixedListAdapter(itemClickListener, itemThumbnailClickListener)
                 .also { this.adapter = it }
-        cardListView.addOnScrollListener(onScrollListener)
+        recyclerView.addOnScrollListener(onScrollListener)
         refresher.setOnRefreshListener { refresh() }
 
         refresher.isRefreshing = true
@@ -55,7 +55,7 @@ class CardListFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        cardListView.removeOnScrollListener(onScrollListener)
+        recyclerView.removeOnScrollListener(onScrollListener)
     }
 
     private val onScrollListener = object : RecyclerView.OnScrollListener() {

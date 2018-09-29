@@ -1,10 +1,10 @@
-package tw.kaneshih.kanetest.card.task
+package tw.kaneshih.kanetest.task
 
 import tw.kaneshih.base.task.CallbackTask
 import tw.kaneshih.base.task.Result
-import tw.kaneshih.kanetest.card.model.Card
-import tw.kaneshih.kanetest.card.model.toCardList
-import tw.kaneshih.kanetest.card.repo.DataSource
+import tw.kaneshih.kanetest.model.Card
+import tw.kaneshih.kanetest.model.toCardList
+import tw.kaneshih.kanetest.repo.DataSource
 import tw.kaneshih.kanetest.viewholder.ItemViewModel
 
 class CardListFetcher(private val offset: Int,

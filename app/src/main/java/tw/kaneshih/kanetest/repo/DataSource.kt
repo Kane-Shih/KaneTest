@@ -1,11 +1,11 @@
-package tw.kaneshih.kanetest.card.repo
+package tw.kaneshih.kanetest.repo
 
 import android.os.SystemClock
 import org.json.JSONArray
 import org.json.JSONObject
-import tw.kaneshih.kanetest.card.model.Card
-import tw.kaneshih.kanetest.card.model.CardType
-import tw.kaneshih.kanetest.card.model.toJSONObject
+import tw.kaneshih.kanetest.model.Card
+import tw.kaneshih.kanetest.model.CardType
+import tw.kaneshih.kanetest.model.toJSONObject
 import java.util.Random
 
 object DataSource { // simulate

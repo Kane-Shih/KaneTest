@@ -44,12 +44,12 @@ class MediumItemVH(private val itemView: View,
 }
 
 class MediumItemViewModel(
-        title: String,
-        imageUrl: String,
-        count: String,
-        url: String,
-        val desc: String)
-    : ItemViewModel(title, imageUrl, count, url)
+        val title: String,
+        val imageUrl: String,
+        val count: String,
+        val desc: String,
+        val url: String)
+    : ItemViewModel()
 
 fun Card.toMediumItemViewModel(context: Context?): MediumItemViewModel {
     return MediumItemViewModel(
@@ -58,6 +58,6 @@ fun Card.toMediumItemViewModel(context: Context?): MediumItemViewModel {
             imageUrl = this.thumbnail,
             count = context?.getString(R.string.card_count_formatter, this.subItemCount)
                     ?: "${this.subItemCount}",
-            url = this.url,
-            desc = this.description)
+            desc = this.description,
+            url = this.url)
 }

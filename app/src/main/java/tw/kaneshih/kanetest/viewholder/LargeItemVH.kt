@@ -41,11 +41,11 @@ class LargeItemVH(private val itemView: View,
 }
 
 class LargeItemViewModel(
-        title: String,
-        imageUrl: String,
-        count: String,
-        url: String)
-    : ItemViewModel(title, imageUrl, count, url)
+        val title: String,
+        val imageUrl: String,
+        val count: String,
+        val url: String)
+    : ItemViewModel()
 
 fun Card.toLargeItemViewModel(): LargeItemViewModel {
     return LargeItemViewModel(

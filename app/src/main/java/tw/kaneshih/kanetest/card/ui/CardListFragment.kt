@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.core.widget.toast
 import kotlinx.android.synthetic.main.fragment_card_list.*
+import tw.kaneshih.base.logcat
 import tw.kaneshih.base.recyclerview.LoadMoreAdapter
 import tw.kaneshih.base.task.Result
 import tw.kaneshih.kanetest.R
@@ -18,6 +19,8 @@ import tw.kaneshih.kanetest.card.model.Card
 import tw.kaneshih.kanetest.card.model.CardType
 import tw.kaneshih.kanetest.card.task.CardListFetcher
 import tw.kaneshih.kanetest.viewholder.ItemViewModel
+import tw.kaneshih.kanetest.viewholder.LargeItemViewModel
+import tw.kaneshih.kanetest.viewholder.MediumItemViewModel
 import tw.kaneshih.kanetest.viewholder.toLargeItemViewModel
 import tw.kaneshih.kanetest.viewholder.toMediumItemViewModel
 
@@ -41,7 +44,7 @@ class CardListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         cardListView.layoutManager = LinearLayoutManager(context)
-        cardListView.adapter = CardListAdapter(this::onCardItemClicked, this::onCardItemThumbnailClicked)
+        cardListView.adapter = CardListAdapter(itemClickListener, itemThumbnailClickListener)
                 .also { this.adapter = it }
         cardListView.addOnScrollListener(onScrollListener)
         refresher.setOnRefreshListener { refresh() }
@@ -76,6 +79,26 @@ class CardListFragment : Fragment() {
         }
     }
 
+    private val itemClickListener: (ItemViewModel) -> Unit = { item ->
+        when (item) {
+            is LargeItemViewModel -> item.url
+            is MediumItemViewModel -> item.url
+            else -> null
+        }?.let {
+            context?.startActivity(Intent(Intent.ACTION_VIEW, it.toUri()))
+        }
+    }
+
+    private val itemThumbnailClickListener: (ItemViewModel) -> Unit = { item ->
+        when (item) {
+            is LargeItemViewModel -> item.imageUrl
+            is MediumItemViewModel -> item.imageUrl
+            else -> null
+        }?.let {
+            context?.startActivity(Intent(Intent.ACTION_VIEW, it.toUri()))
+        }
+    }
+
     private fun refresh() = CardListFetcher(0, PAGE_COUNT, transformer, this::onRefresh).execute()
 
     private fun onRefresh(result: Result<List<ItemViewModel>>) {
@@ -86,6 +109,8 @@ class CardListFragment : Fragment() {
             context?.toast("Failed to refresh data, err: ${result.errorMsg}")
             false
         }
+
+        result.logcat()
 
         refresher.isRefreshing = false
     }
@@ -101,13 +126,7 @@ class CardListFragment : Fragment() {
             context?.toast("Failed to append data, err: ${result.errorMsg}")
             false
         }
-    }
 
-    private fun onCardItemClicked(card: ItemViewModel) {
-        context?.startActivity(Intent(Intent.ACTION_VIEW, card.url.toUri()))
-    }
-
-    private fun onCardItemThumbnailClicked(card: ItemViewModel) {
-        context?.startActivity(Intent(Intent.ACTION_VIEW, card.imageUrl.toUri()))
+        result.logcat()
     }
 }

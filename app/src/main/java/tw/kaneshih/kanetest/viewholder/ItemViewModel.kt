@@ -1,4 +1,4 @@
-package tw.kaneshih.kanetest.card.ui.viewholder
+package tw.kaneshih.kanetest.viewholder
 
 import tw.kaneshih.base.viewholder.ViewModel
 

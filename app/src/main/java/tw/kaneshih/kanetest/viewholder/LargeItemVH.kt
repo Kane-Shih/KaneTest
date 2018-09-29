@@ -1,6 +1,5 @@
-package tw.kaneshih.kanetest.card.ui.viewholder
+package tw.kaneshih.kanetest.viewholder
 
-import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -9,10 +8,10 @@ import tw.kaneshih.kanetest.R
 import tw.kaneshih.kanetest.card.model.Card
 import tw.kaneshih.kanetest.glide.GlideApp
 
-class LargeItemVH(itemView: View,
+class LargeItemVH(private val itemView: View,
                   itemClickListener: (itemViewModel: ItemViewModel) -> Unit,
                   thumbnailClickListener: (itemViewModel: ItemViewModel) -> Unit
-) : RecyclerView.ViewHolder(itemView), ViewHolder<LargeItemViewModel> {
+) : ViewHolder<LargeItemViewModel> {
     private val image: ImageView = itemView.findViewById(R.id.image)
     private val title: TextView = itemView.findViewById(R.id.title)
     private val count: TextView = itemView.findViewById(R.id.count)
@@ -38,9 +37,7 @@ class LargeItemVH(itemView: View,
         count.text = viewModel.count
     }
 
-    override fun getViewModel() = viewModel
-
-    override fun getView() = itemView!!
+    override fun getView() = itemView
 }
 
 class LargeItemViewModel(

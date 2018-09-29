@@ -1,22 +1,22 @@
 package tw.kaneshih.kanetest.card.ui
 
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import tw.kaneshih.base.viewholder.ViewHolder
-import tw.kaneshih.base.viewholder.ViewModel
 import tw.kaneshih.base.recyclerview.LoadMoreAdapter
+import tw.kaneshih.base.viewholder.RecyclerVH
 import tw.kaneshih.kanetest.R
-import tw.kaneshih.kanetest.card.ui.viewholder.ItemViewModel
-import tw.kaneshih.kanetest.card.ui.viewholder.LargeItemVH
-import tw.kaneshih.kanetest.card.ui.viewholder.LargeItemViewModel
-import tw.kaneshih.kanetest.card.ui.viewholder.MediumItemVH
-import tw.kaneshih.kanetest.card.ui.viewholder.MediumItemViewModel
+import tw.kaneshih.base.viewholder.BasicVH
+import tw.kaneshih.kanetest.viewholder.ItemViewModel
+import tw.kaneshih.kanetest.viewholder.LargeItemVH
+import tw.kaneshih.kanetest.viewholder.LargeItemViewModel
+import tw.kaneshih.kanetest.viewholder.MediumItemVH
+import tw.kaneshih.kanetest.viewholder.MediumItemViewModel
 
 class CardListAdapter(
         private val onItemClickListener: (itemViewModel: ItemViewModel) -> Unit,
         private val onItemThumbnailClickListener: (itemViewModel: ItemViewModel) -> Unit
-) : LoadMoreAdapter<RecyclerView.ViewHolder, ItemViewModel>() {
+) : LoadMoreAdapter<RecyclerVH<ItemViewModel>, ItemViewModel>() {
     companion object {
         const val VIEW_TYPE_LOADING = 0
         const val VIEW_TYPE_CARD_LARGE = 1
@@ -51,8 +51,8 @@ class CardListAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return when (viewType) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerVH<ItemViewModel> {
+        val vh = when (viewType) {
             VIEW_TYPE_CARD_LARGE ->
                 LargeItemVH(LayoutInflater.from(parent.context)
                         .inflate(R.layout.item_card_large, parent, false),
@@ -63,18 +63,16 @@ class CardListAdapter(
                         .inflate(R.layout.item_card_medium, parent, false),
                         onItemClickListener, onItemThumbnailClickListener)
 
-            else ->
-                object : RecyclerView.ViewHolder(LayoutInflater.from(parent.context)
-                        .inflate(R.layout.item_load, parent, false)) {
-                    // override nothing
-                }
+            else -> BasicVH<ItemViewModel>(LayoutInflater.from(parent.context)
+                    .inflate(R.layout.item_load, parent, false))
         }
+        @Suppress("UNCHECKED_CAST") // just make it to pass compiler ...
+        return RecyclerVH(vh as ViewHolder<ItemViewModel>)
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerVH<ItemViewModel>, position: Int) {
         if (holder.itemViewType != VIEW_TYPE_LOADING) {
-            @Suppress("UNCHECKED_CAST")
-            (holder as ViewHolder<ViewModel>).bind(list[position])
+            holder.viewHolder.bind(list[position])
         }
     }
 }

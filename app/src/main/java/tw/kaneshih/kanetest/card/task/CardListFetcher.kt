@@ -5,7 +5,7 @@ import tw.kaneshih.base.task.Result
 import tw.kaneshih.kanetest.card.model.Card
 import tw.kaneshih.kanetest.card.model.toCardList
 import tw.kaneshih.kanetest.card.repo.DataSource
-import tw.kaneshih.kanetest.card.ui.viewholder.ItemViewModel
+import tw.kaneshih.kanetest.viewholder.ItemViewModel
 
 class CardListFetcher(private val offset: Int,
                       private val count: Int,

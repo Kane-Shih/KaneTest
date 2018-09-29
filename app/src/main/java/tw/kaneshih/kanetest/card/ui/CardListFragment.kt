@@ -17,9 +17,9 @@ import tw.kaneshih.kanetest.R
 import tw.kaneshih.kanetest.card.model.Card
 import tw.kaneshih.kanetest.card.model.CardType
 import tw.kaneshih.kanetest.card.task.CardListFetcher
-import tw.kaneshih.kanetest.card.ui.viewholder.ItemViewModel
-import tw.kaneshih.kanetest.card.ui.viewholder.toLargeItemViewModel
-import tw.kaneshih.kanetest.card.ui.viewholder.toMediumItemViewModel
+import tw.kaneshih.kanetest.viewholder.ItemViewModel
+import tw.kaneshih.kanetest.viewholder.toLargeItemViewModel
+import tw.kaneshih.kanetest.viewholder.toMediumItemViewModel
 
 class CardListFragment : Fragment() {
     companion object {

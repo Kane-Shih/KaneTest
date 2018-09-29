@@ -7,4 +7,6 @@ interface ViewHolder<in T : ViewModel> {
     fun getView(): View
 }
 
-interface ViewModel
+interface ViewModel {
+    val userData: Any?
+}

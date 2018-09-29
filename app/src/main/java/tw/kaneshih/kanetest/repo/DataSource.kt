@@ -3,13 +3,16 @@ package tw.kaneshih.kanetest.repo
 import android.os.SystemClock
 import org.json.JSONArray
 import org.json.JSONObject
+import tw.kaneshih.kanetest.model.Book
 import tw.kaneshih.kanetest.model.Card
 import tw.kaneshih.kanetest.model.CardType
 import tw.kaneshih.kanetest.model.toJSONObject
 import java.util.Random
 
 object DataSource { // simulate
-    private const val TOTAL_ITEM = 55
+    private const val TOTAL_CARDS_ITEM = 55
+    private const val TOTAL_BOOKS_ITEM = 32
+
     private const val SLEEP_TIME_MS = 1000L
 
     private val thumbnailList = listOf(
@@ -31,18 +34,44 @@ object DataSource { // simulate
 
         val jArray = JSONArray()
         for (i in offset..(offset + count - 1)) {
-            if (i >= TOTAL_ITEM) {
+            if (i >= TOTAL_CARDS_ITEM) {
                 break
             }
 
             jArray.put(Card(
-                    id = "card\$$i",
+                    id = "card_id_$i",
                     type = if (i % 3 == 0) CardType.LARGE else CardType.MEDIUM,
                     name = "Card [${i + 1}]",
                     description = "Desc for [${i + 1}]".repeat(20),
                     thumbnail = thumbnailList[i % thumbnailList.size],
                     url = urlList[i % urlList.size],
                     subItemCount = random.nextInt(101)
+            ).toJSONObject())
+        }
+
+        val jResult = JSONObject()
+        jResult.put("result", jArray)
+        return jResult
+    }
+
+    fun getBookList(offset: Int, count: Int): JSONObject {
+        SystemClock.sleep(SLEEP_TIME_MS)
+
+        val jArray = JSONArray()
+        for (i in offset..(offset + count - 1)) {
+            if (i >= TOTAL_BOOKS_ITEM) {
+                break
+            }
+
+            jArray.put(Book(
+                    id = "book_id_$i",
+                    title = "Book [${i + 1}]",
+                    description = "This book [${i + 1}] is not a food.".repeat(20),
+                    thumbnail = thumbnailList[i % thumbnailList.size],
+                    url = urlList[i % urlList.size],
+                    authorId = "author_id_$i",
+                    authorName = "Author$i",
+                    publishYear = 1900 + i
             ).toJSONObject())
         }
 

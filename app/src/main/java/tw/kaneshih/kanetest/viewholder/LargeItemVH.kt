@@ -7,6 +7,7 @@ import tw.kaneshih.base.viewholder.ViewHolder
 import tw.kaneshih.kanetest.R
 import tw.kaneshih.kanetest.model.Card
 import tw.kaneshih.kanetest.glide.GlideApp
+import tw.kaneshih.kanetest.model.Book
 
 class LargeItemVH(private val itemView: View,
                   itemClickListener: (itemViewModel: ItemViewModel) -> Unit,
@@ -44,7 +45,8 @@ class LargeItemViewModel(
         val title: String,
         val imageUrl: String,
         val count: String,
-        val url: String)
+        val url: String,
+        override val userData: Any?)
     : ItemViewModel()
 
 fun Card.toLargeItemViewModel(): LargeItemViewModel {
@@ -52,5 +54,16 @@ fun Card.toLargeItemViewModel(): LargeItemViewModel {
             title = this.name,
             imageUrl = this.thumbnail,
             count = "${this.subItemCount}",
-            url = this.url)
+            url = this.url,
+            userData = this.id)
+}
+
+fun Book.toLargeItemViewModel(ranking: Int): LargeItemViewModel {
+    return LargeItemViewModel(
+            title = this.title,
+            imageUrl = this.thumbnail,
+            count = "$ranking",
+            url = this.url,
+            userData = this.id
+    )
 }

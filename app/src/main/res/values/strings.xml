@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">KaneTest</string>
 
-    <string name="card_id_formatter">#%s</string>
+    <string name="card_name_formatter">#%s</string>
     <string name="card_count_formatter">:%d</string>
+
+    <string name="book_title_formatter">{%s}</string>
+    <string name="book_desc_formatter">Author: %1$s, Pub.: %2$d\n Desc: %3$s</string>
 </resources>

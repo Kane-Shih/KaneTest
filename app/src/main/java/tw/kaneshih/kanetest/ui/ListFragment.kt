@@ -15,26 +15,57 @@ import tw.kaneshih.base.logcat
 import tw.kaneshih.base.recyclerview.LoadMoreAdapter
 import tw.kaneshih.base.task.Result
 import tw.kaneshih.kanetest.R
+import tw.kaneshih.kanetest.model.Book
 import tw.kaneshih.kanetest.model.Card
 import tw.kaneshih.kanetest.model.CardType
+import tw.kaneshih.kanetest.task.BookListFetcher
 import tw.kaneshih.kanetest.task.CardListFetcher
 import tw.kaneshih.kanetest.viewholder.ItemViewModel
 import tw.kaneshih.kanetest.viewholder.LargeItemViewModel
 import tw.kaneshih.kanetest.viewholder.MediumItemViewModel
 import tw.kaneshih.kanetest.viewholder.toLargeItemViewModel
 import tw.kaneshih.kanetest.viewholder.toMediumItemViewModel
+import java.lang.RuntimeException
 
-class MixedListFragment : Fragment() {
+class ListFragment : Fragment() {
     companion object {
         const val PAGE_COUNT = 20
         const val LOAD_MORE_THRESHOLD = 5
 
-        fun getInstance() = MixedListFragment()
+        private const val ARGS_TYPE = "args_type"
+
+        fun getInstance(args: Bundle) = ListFragment().apply {
+            arguments = args
+        }
+
+        fun createArgsForCards() = Bundle().apply {
+            putString(ARGS_TYPE, ListType.CARDS.name)
+        }
+
+        fun createArgsForBooks() = Bundle().apply {
+            putString(ARGS_TYPE, ListType.BOOKS.name)
+        }
     }
+
+    interface Host {
+        fun onUpdateTitle(title: String)
+    }
+
+    private enum class ListType {
+        BOOKS, CARDS
+    }
+
+    private lateinit var listType: ListType
 
     private var canLoadMore = true
 
     private lateinit var adapter: LoadMoreAdapter<*, ItemViewModel>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        listType = ListType.valueOf(arguments?.getString(ARGS_TYPE)
+                ?: throw RuntimeException("Developer Error: wrong args in ListFragment"))
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.layout_refresher_recyclerview, container, false)
@@ -44,7 +75,7 @@ class MixedListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = MixedListAdapter(itemClickListener, itemThumbnailClickListener)
+        recyclerView.adapter = ListAdapter(itemClickListener, itemThumbnailClickListener)
                 .also { this.adapter = it }
         recyclerView.addOnScrollListener(onScrollListener)
         refresher.setOnRefreshListener { refresh() }
@@ -72,10 +103,18 @@ class MixedListFragment : Fragment() {
         }
     }
 
-    private val transformer = { card: Card ->
+    private val cardTransformer = { _: Int, card: Card ->
         when (card.type) {
             CardType.LARGE -> card.toLargeItemViewModel()
             CardType.MEDIUM -> card.toMediumItemViewModel(context)
+        }
+    }
+
+    private val bookTransformer = { index: Int, book: Book ->
+        if (index < 4) {
+            book.toLargeItemViewModel(index + 1)
+        } else {
+            book.toMediumItemViewModel(context)
         }
     }
 
@@ -91,15 +130,26 @@ class MixedListFragment : Fragment() {
 
     private val itemThumbnailClickListener: (ItemViewModel) -> Unit = { item ->
         when (item) {
-            is LargeItemViewModel -> item.imageUrl
-            is MediumItemViewModel -> item.imageUrl
+            is LargeItemViewModel -> item.userData
+            is MediumItemViewModel -> item.userData
             else -> null
         }?.let {
-            context?.startActivity(Intent(Intent.ACTION_VIEW, it.toUri()))
+            context?.toast("image of [$it] is clicked!")
         }
     }
 
-    private fun refresh() = CardListFetcher(0, PAGE_COUNT, transformer, this::onRefresh).execute()
+    private fun startFetcher(offset: Int, callback: (Result<List<ItemViewModel>>) -> Unit) {
+        when (listType) {
+            ListType.CARDS -> CardListFetcher(offset, PAGE_COUNT, cardTransformer, callback)
+            ListType.BOOKS -> BookListFetcher(offset, PAGE_COUNT, bookTransformer, callback)
+        }.execute()
+    }
+
+    private fun refresh() {
+        startFetcher(0, this::onRefresh)
+
+        (activity as? Host)?.onUpdateTitle("fetching list of $listType")
+    }
 
     private fun onRefresh(result: Result<List<ItemViewModel>>) {
         canLoadMore = if (result.isSuccess) {
@@ -113,9 +163,15 @@ class MixedListFragment : Fragment() {
         result.logcat()
 
         refresher.isRefreshing = false
+
+        (activity as? Host)?.onUpdateTitle("refreshed list of $listType, total: ${adapter.countWithoutLoadingItem}, end? ${!canLoadMore}")
     }
 
-    private fun loadMore(offset: Int) = CardListFetcher(offset, PAGE_COUNT, transformer, this::onLoadMore).execute()
+    private fun loadMore(offset: Int) {
+        startFetcher(offset, this::onLoadMore)
+
+        (activity as? Host)?.onUpdateTitle("appending list of $listType, offset: $offset")
+    }
 
     private fun onLoadMore(result: Result<List<ItemViewModel>>) {
         canLoadMore = if (result.isSuccess) {
@@ -128,5 +184,7 @@ class MixedListFragment : Fragment() {
         }
 
         result.logcat()
+
+        (activity as? Host)?.onUpdateTitle("appended list of $listType, total: ${adapter.countWithoutLoadingItem}, end? ${!canLoadMore}")
     }
 }

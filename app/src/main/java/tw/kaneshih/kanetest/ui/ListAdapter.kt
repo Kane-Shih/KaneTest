@@ -13,7 +13,7 @@ import tw.kaneshih.kanetest.viewholder.LargeItemViewModel
 import tw.kaneshih.kanetest.viewholder.MediumItemVH
 import tw.kaneshih.kanetest.viewholder.MediumItemViewModel
 
-class MixedListAdapter(
+class ListAdapter(
         private val onItemClickListener: (itemViewModel: ItemViewModel) -> Unit,
         private val onItemThumbnailClickListener: (itemViewModel: ItemViewModel) -> Unit
 ) : LoadMoreAdapter<RecyclerVH<ItemViewModel>, ItemViewModel>() {

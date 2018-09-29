@@ -8,6 +8,7 @@ import tw.kaneshih.base.viewholder.ViewHolder
 import tw.kaneshih.kanetest.R
 import tw.kaneshih.kanetest.model.Card
 import tw.kaneshih.kanetest.glide.GlideApp
+import tw.kaneshih.kanetest.model.Book
 
 class MediumItemVH(private val itemView: View,
                    itemClickListener: (itemViewModel: ItemViewModel) -> Unit,
@@ -48,16 +49,30 @@ class MediumItemViewModel(
         val imageUrl: String,
         val count: String,
         val desc: String,
-        val url: String)
+        val url: String,
+        override val userData: Any?)
     : ItemViewModel()
 
 fun Card.toMediumItemViewModel(context: Context?): MediumItemViewModel {
     return MediumItemViewModel(
-            title = context?.getString(R.string.card_id_formatter, this.name)
+            title = context?.getString(R.string.card_name_formatter, this.name)
                     ?: this.name,
             imageUrl = this.thumbnail,
             count = context?.getString(R.string.card_count_formatter, this.subItemCount)
                     ?: "${this.subItemCount}",
             desc = this.description,
-            url = this.url)
+            url = this.url,
+            userData = this.id)
+}
+
+fun Book.toMediumItemViewModel(context: Context?): MediumItemViewModel {
+    return MediumItemViewModel(
+            title = context?.getString(R.string.book_title_formatter, this.title)
+                    ?: this.title,
+            imageUrl = this.thumbnail,
+            count = "",
+            desc = context?.getString(R.string.book_desc_formatter, this.authorName, this.publishYear, this.description)
+                    ?: this.description,
+            url = this.url,
+            userData = this.id)
 }

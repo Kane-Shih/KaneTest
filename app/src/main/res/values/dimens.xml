@@ -9,6 +9,15 @@
     <dimen name="item_medium_left_image_desc">16sp</dimen>
     <dimen name="item_medium_left_image_count">14sp</dimen>
 
+    <dimen name="item_medium_right_image_padding">16dp</dimen>
+    <dimen name="item_medium_right_image_image_size">64dp</dimen>
+    <dimen name="item_medium_right_image_image_margin_bottom">12dp</dimen>
+    <dimen name="item_medium_right_image_image_margin_end">12dp</dimen>
+    <dimen name="item_medium_right_image_title_margin_bottom">12dp</dimen>
+    <dimen name="item_medium_right_image_title">18sp</dimen>
+    <dimen name="item_medium_right_image_desc">16sp</dimen>
+    <dimen name="item_medium_right_image_count">14sp</dimen>
+
     <dimen name="item_large_centered_image_size">128dp</dimen>
     <dimen name="item_large_centered_image_mask_height">60dp</dimen>
     <dimen name="item_large_centered_title">22sp</dimen>

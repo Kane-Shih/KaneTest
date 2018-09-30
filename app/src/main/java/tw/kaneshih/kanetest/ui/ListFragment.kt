@@ -129,12 +129,13 @@ class ListFragment : Fragment() {
     }
 
     private val itemThumbnailClickListener: (ItemViewModel) -> Unit = { item ->
-        when (item) {
-            is LargeItemViewModel -> item.userData
-            is MediumItemViewModel -> item.userData
+        val userData = item.userData
+        when (userData) {
+            is Card -> "Card[${userData.id}] ${userData.name}"
+            is Book -> "Book[${userData.id}] ${userData.title}"
             else -> null
         }?.let {
-            context?.toast("image of [$it] is clicked!")
+            context?.toast("image of $it is clicked!")
         }
     }
 

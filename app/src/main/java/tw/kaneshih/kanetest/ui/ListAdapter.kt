@@ -7,6 +7,8 @@ import tw.kaneshih.base.recyclerview.LoadMoreAdapter
 import tw.kaneshih.base.viewholder.RecyclerVH
 import tw.kaneshih.kanetest.R
 import tw.kaneshih.base.viewholder.BasicVH
+import tw.kaneshih.kanetest.model.Book
+import tw.kaneshih.kanetest.model.Card
 import tw.kaneshih.kanetest.viewholder.ItemViewModel
 import tw.kaneshih.kanetest.viewholder.LargeItemVH
 import tw.kaneshih.kanetest.viewholder.LargeItemViewModel
@@ -21,6 +23,7 @@ class ListAdapter(
         const val VIEW_TYPE_LOADING = 0
         const val VIEW_TYPE_LARGE_CENTERED = 1
         const val VIEW_TYPE_MEDIUM_LEFT_IMAGE = 2
+        const val VIEW_TYPE_MEDIUM_RIGHT_IMAGE = 3
     }
 
     private val list = mutableListOf<ItemViewModel>()
@@ -43,8 +46,16 @@ class ListAdapter(
         return if (isItemViewTypeLoading(position)) {
             VIEW_TYPE_LOADING
         } else {
-            when (list[position]) {
-                is MediumItemViewModel -> VIEW_TYPE_MEDIUM_LEFT_IMAGE
+            val viewModel = list[position]
+            when (viewModel) {
+                is MediumItemViewModel -> when (viewModel.userData) {
+                    is Card -> VIEW_TYPE_MEDIUM_LEFT_IMAGE
+                    is Book -> {
+                        if (position % 2 == 0) VIEW_TYPE_MEDIUM_RIGHT_IMAGE
+                        else VIEW_TYPE_MEDIUM_LEFT_IMAGE
+                    }
+                    else -> VIEW_TYPE_MEDIUM_LEFT_IMAGE
+                }
                 is LargeItemViewModel -> VIEW_TYPE_LARGE_CENTERED
                 else -> VIEW_TYPE_MEDIUM_LEFT_IMAGE
             }
@@ -61,6 +72,11 @@ class ListAdapter(
             VIEW_TYPE_MEDIUM_LEFT_IMAGE ->
                 MediumItemVH(LayoutInflater.from(parent.context)
                         .inflate(R.layout.item_medium_left_image, parent, false),
+                        onItemClickListener, onItemThumbnailClickListener)
+
+            VIEW_TYPE_MEDIUM_RIGHT_IMAGE ->
+                MediumItemVH(LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_medium_right_image, parent, false),
                         onItemClickListener, onItemThumbnailClickListener)
 
             else -> BasicVH<ItemViewModel>(LayoutInflater.from(parent.context)

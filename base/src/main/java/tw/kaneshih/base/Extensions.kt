@@ -1,6 +1,10 @@
 package tw.kaneshih.base
 
+import android.content.Context
+import android.support.annotation.DrawableRes
 import android.util.Log
+import android.util.TypedValue
+import android.view.View
 import tw.kaneshih.base.task.Result
 
 const val LOG_TAG = "Kane"
@@ -31,3 +35,14 @@ fun Result<*>?.logcat(tag: String = LOG_TAG) {
                     msg = "$taskName's Result FAILED: $errorMsg")
     }
 }
+
+@DrawableRes
+fun Context.getSelectableItemBackground() =
+        with(TypedValue()) {
+            this@getSelectableItemBackground.theme
+                    .resolveAttribute(R.attr.selectableItemBackground, this, true)
+            this.resourceId
+        }
+
+fun View.setSelectableItemBackground() =
+        setBackgroundResource(context.getSelectableItemBackground())

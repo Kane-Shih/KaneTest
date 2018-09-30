@@ -1,6 +1,8 @@
 package tw.kaneshih.base
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.support.annotation.DrawableRes
 import android.util.Log
 import android.util.TypedValue
@@ -46,3 +48,8 @@ fun Context.getSelectableItemBackground() =
 
 fun View.setSelectableItemBackground() =
         setBackgroundResource(context.getSelectableItemBackground())
+
+fun Context.isNetworkConnected() =
+        (getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager)
+                .activeNetworkInfo
+                ?.isConnected == true

@@ -1,5 +1,6 @@
 package tw.kaneshih.kanetest.ui
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -20,6 +21,8 @@ import tw.kaneshih.kanetest.model.Card
 import tw.kaneshih.kanetest.model.CardType
 import tw.kaneshih.kanetest.task.BookListFetcher
 import tw.kaneshih.kanetest.task.CardListFetcher
+import tw.kaneshih.kanetest.task.Error
+import tw.kaneshih.kanetest.task.resolveError
 import tw.kaneshih.kanetest.viewholder.ItemViewModel
 import tw.kaneshih.kanetest.viewholder.LargeItemViewModel
 import tw.kaneshih.kanetest.viewholder.MediumItemViewModel
@@ -153,11 +156,14 @@ class ListFragment : Fragment() {
     }
 
     private fun onRefresh(result: Result<List<ItemViewModel>>) {
+        val context = if (isAdded && !isRemoving) context ?: return else return
+
         canLoadMore = if (result.isSuccess) {
             adapter.refreshData(result.data!!)
             result.data!!.size >= PAGE_COUNT
         } else {
-            context?.toast("Failed to refresh data, err: ${result.errorMsg}")
+            context.showError(result)
+            //context?.toast("Failed to refresh data, err: ${result.errorMsg}")
             false
         }
 
@@ -175,17 +181,29 @@ class ListFragment : Fragment() {
     }
 
     private fun onLoadMore(result: Result<List<ItemViewModel>>) {
+        val context = if (isAdded && !isRemoving) context ?: return else return
+
         canLoadMore = if (result.isSuccess) {
             adapter.appendData(result.data!!)
             result.data!!.size >= PAGE_COUNT
         } else {
             adapter.stopLoading()
-            context?.toast("Failed to append data, err: ${result.errorMsg}")
+            context.showError(result)
+            //context?.toast("Failed to append data, err: ${result.errorMsg}")
             false
         }
 
         result.logcat()
 
         (activity as? Host)?.onUpdateTitle("appended list of $listType, total: ${adapter.countWithoutLoadingItem}, end? ${!canLoadMore}")
+    }
+
+    private fun Context.showError(result: Result<*>) {
+        when (result.resolveError()) {
+            Error.ERROR_NETWORK_CONNECTIVITY -> toast("Please check your network.\n${result.errorMsg}")
+            Error.ERROR_DATA_FORMAT -> toast("Something wrong at data side.\n${result.errorMsg}")
+            Error.ERROR_OTHERS -> toast("Mystery error happened.\n${result.errorMsg}")
+            Error.NO_ERROR -> return
+        }
     }
 }

@@ -5,7 +5,7 @@ import tw.kaneshih.base.task.Result
 import tw.kaneshih.kanetest.model.Book
 import tw.kaneshih.kanetest.model.toBookList
 import tw.kaneshih.kanetest.repo.DataSource
-import tw.kaneshih.kanetest.viewholder.ItemViewModel
+import tw.kaneshih.base.viewholder.ItemViewModel
 
 class BookListFetcher(private val offset: Int,
                       private val count: Int,

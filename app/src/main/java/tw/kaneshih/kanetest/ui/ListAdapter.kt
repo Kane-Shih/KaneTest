@@ -9,7 +9,7 @@ import tw.kaneshih.kanetest.R
 import tw.kaneshih.base.viewholder.BasicVH
 import tw.kaneshih.kanetest.model.Book
 import tw.kaneshih.kanetest.model.Card
-import tw.kaneshih.kanetest.viewholder.ItemViewModel
+import tw.kaneshih.base.viewholder.ItemViewModel
 import tw.kaneshih.kanetest.viewholder.LargeItemVH
 import tw.kaneshih.kanetest.viewholder.LargeItemViewModel
 import tw.kaneshih.kanetest.viewholder.MediumItemVH
@@ -48,7 +48,7 @@ class ListAdapter(
         } else {
             val viewModel = list[position]
             when (viewModel) {
-                is MediumItemViewModel -> when (viewModel.userData) {
+                is MediumItemViewModel -> when (viewModel.data) {
                     is Card -> VIEW_TYPE_MEDIUM_LEFT_IMAGE
                     is Book -> {
                         if (position % 2 == 0) VIEW_TYPE_MEDIUM_RIGHT_IMAGE

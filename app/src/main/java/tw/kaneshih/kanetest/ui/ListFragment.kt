@@ -12,7 +12,8 @@ import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.core.widget.toast
 import kotlinx.android.synthetic.main.layout_refresher_recyclerview.*
-import tw.kaneshih.base.logcat
+import tw.kaneshih.base.log.logDebug
+import tw.kaneshih.base.log.logcat
 import tw.kaneshih.base.recyclerview.LoadMoreAdapter
 import tw.kaneshih.base.task.Result
 import tw.kaneshih.kanetest.R
@@ -23,7 +24,7 @@ import tw.kaneshih.kanetest.task.BookListFetcher
 import tw.kaneshih.kanetest.task.CardListFetcher
 import tw.kaneshih.kanetest.task.Error
 import tw.kaneshih.kanetest.task.resolveError
-import tw.kaneshih.kanetest.viewholder.ItemViewModel
+import tw.kaneshih.base.viewholder.ItemViewModel
 import tw.kaneshih.kanetest.viewholder.LargeItemViewModel
 import tw.kaneshih.kanetest.viewholder.MediumItemViewModel
 import tw.kaneshih.kanetest.viewholder.toLargeItemViewModel
@@ -34,6 +35,8 @@ class ListFragment : Fragment() {
     companion object {
         const val PAGE_COUNT = 20
         const val LOAD_MORE_THRESHOLD = 5
+
+        const val USERDATA_KEY_INDEX = "index"
 
         private const val ARGS_TYPE = "args_type"
 
@@ -106,10 +109,12 @@ class ListFragment : Fragment() {
         }
     }
 
-    private val cardTransformer = { _: Int, card: Card ->
+    private val cardTransformer = { index: Int, card: Card ->
         when (card.type) {
             CardType.LARGE -> card.toLargeItemViewModel()
             CardType.MEDIUM -> card.toMediumItemViewModel(context)
+        }.apply {
+            userData[USERDATA_KEY_INDEX] = index
         }
     }
 
@@ -118,6 +123,8 @@ class ListFragment : Fragment() {
             book.toLargeItemViewModel(index + 1)
         } else {
             book.toMediumItemViewModel(context)
+        }.apply {
+            userData[USERDATA_KEY_INDEX] = index
         }
     }
 
@@ -128,14 +135,15 @@ class ListFragment : Fragment() {
             else -> null
         }?.let {
             context?.startActivity(Intent(Intent.ACTION_VIEW, it.toUri()))
+            "itemClicked @row${item.userData[USERDATA_KEY_INDEX]}".logDebug()
         }
     }
 
     private val itemThumbnailClickListener: (ItemViewModel) -> Unit = { item ->
-        val userData = item.userData
-        when (userData) {
-            is Card -> "Card[${userData.id}] ${userData.name}"
-            is Book -> "Book[${userData.id}] ${userData.title}"
+        val data = item.data
+        when (data) {
+            is Card -> "Card[${data.id}] ${data.name} @ row${item.userData[USERDATA_KEY_INDEX]}"
+            is Book -> "Book[${data.id}] ${data.title} @ row${item.userData[USERDATA_KEY_INDEX]}"
             else -> null
         }?.let {
             context?.toast("image of $it is clicked!")

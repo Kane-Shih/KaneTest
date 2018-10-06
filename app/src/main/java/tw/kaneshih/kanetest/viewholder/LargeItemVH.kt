@@ -3,6 +3,7 @@ package tw.kaneshih.kanetest.viewholder
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import tw.kaneshih.base.viewholder.ItemViewModel
 import tw.kaneshih.base.viewholder.ViewHolder
 import tw.kaneshih.kanetest.R
 import tw.kaneshih.kanetest.model.Card
@@ -45,8 +46,7 @@ class LargeItemViewModel(
         val title: String,
         val imageUrl: String,
         val count: String,
-        val url: String,
-        override val userData: Any?)
+        val url: String)
     : ItemViewModel()
 
 fun Card.toLargeItemViewModel(): LargeItemViewModel {
@@ -54,8 +54,9 @@ fun Card.toLargeItemViewModel(): LargeItemViewModel {
             title = this.name,
             imageUrl = this.thumbnail,
             count = "${this.subItemCount}",
-            url = this.url,
-            userData = this)
+            url = this.url).apply {
+        data = this@toLargeItemViewModel
+    }
 }
 
 fun Book.toLargeItemViewModel(ranking: Int): LargeItemViewModel {
@@ -63,7 +64,8 @@ fun Book.toLargeItemViewModel(ranking: Int): LargeItemViewModel {
             title = this.title,
             imageUrl = this.thumbnail,
             count = "$ranking",
-            url = this.url,
-            userData = this
-    )
+            url = this.url
+    ).apply {
+        data = this@toLargeItemViewModel
+    }
 }

@@ -8,5 +8,5 @@ interface ViewHolder<in T : ViewModel> {
 }
 
 interface ViewModel {
-    val userData: Any?
+    val userData: MutableMap<String, Any?>
 }

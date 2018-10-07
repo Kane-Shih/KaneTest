@@ -24,5 +24,8 @@
     <dimen name="item_large_centered_title_margin_bottom">10dp</dimen>
     <dimen name="item_large_centered_count">16sp</dimen>
 
+    <dimen name="item_group_title">18sp</dimen>
+    <dimen name="item_group_title_padding">16dp</dimen>
+
     <dimen name="load_item_size">36dp</dimen>
 </resources>

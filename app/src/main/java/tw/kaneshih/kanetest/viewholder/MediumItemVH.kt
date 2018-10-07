@@ -62,7 +62,7 @@ fun Card.toMediumItemViewModel(context: Context?): MediumItemViewModel {
                     ?: "${this.subItemCount}",
             desc = this.description,
             url = this.url).apply {
-        data = this@toMediumItemViewModel
+        userData = this@toMediumItemViewModel
     }
 }
 
@@ -75,6 +75,6 @@ fun Book.toMediumItemViewModel(context: Context?): MediumItemViewModel {
             desc = context?.getString(R.string.book_desc_formatter, this.authorName, this.publishYear, this.description)
                     ?: this.description,
             url = this.url).apply {
-        data = this@toMediumItemViewModel
+        userData = this@toMediumItemViewModel
     }
 }

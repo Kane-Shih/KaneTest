@@ -55,7 +55,7 @@ fun Card.toLargeItemViewModel(): LargeItemViewModel {
             imageUrl = this.thumbnail,
             count = "${this.subItemCount}",
             url = this.url).apply {
-        data = this@toLargeItemViewModel
+        userData = this@toLargeItemViewModel
     }
 }
 
@@ -66,6 +66,6 @@ fun Book.toLargeItemViewModel(ranking: Int): LargeItemViewModel {
             count = "$ranking",
             url = this.url
     ).apply {
-        data = this@toLargeItemViewModel
+        userData = this@toLargeItemViewModel
     }
 }

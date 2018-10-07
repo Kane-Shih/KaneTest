@@ -1,5 +1,6 @@
 package tw.kaneshih.base.viewholder
 
+import android.os.Bundle
 import android.view.View
 
 interface ViewHolder<in T : ViewModel> {
@@ -8,5 +9,5 @@ interface ViewHolder<in T : ViewModel> {
 }
 
 interface ViewModel {
-    val userData: MutableMap<String, Any?>
+    val extra: Bundle
 }

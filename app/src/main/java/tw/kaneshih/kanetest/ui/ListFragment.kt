@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.core.widget.toast
 import kotlinx.android.synthetic.main.layout_refresher_recyclerview.*
+import tw.kaneshih.base.isNetworkConnected
 import tw.kaneshih.base.log.logDebug
 import tw.kaneshih.base.log.logcat
 import tw.kaneshih.base.recyclerview.LoadMoreAdapter
@@ -27,6 +28,7 @@ import tw.kaneshih.kanetest.task.resolveError
 import tw.kaneshih.base.viewholder.ItemViewModel
 import tw.kaneshih.kanetest.viewholder.LargeItemViewModel
 import tw.kaneshih.kanetest.viewholder.MediumItemViewModel
+import tw.kaneshih.kanetest.viewholder.TextViewModel
 import tw.kaneshih.kanetest.viewholder.toLargeItemViewModel
 import tw.kaneshih.kanetest.viewholder.toMediumItemViewModel
 import java.lang.RuntimeException
@@ -114,7 +116,7 @@ class ListFragment : Fragment() {
             CardType.LARGE -> card.toLargeItemViewModel()
             CardType.MEDIUM -> card.toMediumItemViewModel(context)
         }.apply {
-            userData[USERDATA_KEY_INDEX] = index
+            extra.putInt(USERDATA_KEY_INDEX, index)
         }
     }
 
@@ -124,7 +126,13 @@ class ListFragment : Fragment() {
         } else {
             book.toMediumItemViewModel(context)
         }.apply {
-            userData[USERDATA_KEY_INDEX] = index
+            extra.putInt(USERDATA_KEY_INDEX, index)
+        }
+    }
+
+    private val bookListTransformer = { list: List<ItemViewModel> ->
+        list.toMutableList().apply {
+            add(4, TextViewModel(">> Medium layout below"))
         }
     }
 
@@ -135,15 +143,15 @@ class ListFragment : Fragment() {
             else -> null
         }?.let {
             context?.startActivity(Intent(Intent.ACTION_VIEW, it.toUri()))
-            "itemClicked @row${item.userData[USERDATA_KEY_INDEX]}".logDebug()
+            "itemClicked @row${item.extra.getInt(USERDATA_KEY_INDEX)}".logDebug()
         }
     }
 
     private val itemThumbnailClickListener: (ItemViewModel) -> Unit = { item ->
-        val data = item.data
+        val data = item.userData
         when (data) {
-            is Card -> "Card[${data.id}] ${data.name} @ row${item.userData[USERDATA_KEY_INDEX]}"
-            is Book -> "Book[${data.id}] ${data.title} @ row${item.userData[USERDATA_KEY_INDEX]}"
+            is Card -> "Card[${data.id}] ${data.name} @ row${item.extra.getInt(USERDATA_KEY_INDEX)}"
+            is Book -> "Book[${data.id}] ${data.title} @ row${item.extra.getInt(USERDATA_KEY_INDEX)}"
             else -> null
         }?.let {
             context?.toast("image of $it is clicked!")
@@ -152,8 +160,16 @@ class ListFragment : Fragment() {
 
     private fun startFetcher(offset: Int, callback: (Result<List<ItemViewModel>>) -> Unit) {
         when (listType) {
-            ListType.CARDS -> CardListFetcher(offset, PAGE_COUNT, cardTransformer, callback)
-            ListType.BOOKS -> BookListFetcher(offset, PAGE_COUNT, bookTransformer, callback)
+            ListType.CARDS -> CardListFetcher(offset, PAGE_COUNT,
+                    cardTransformer, null,
+                    callback)
+            ListType.BOOKS ->
+                BookListFetcher(
+                        offset = if (offset > 0) offset - 1 else offset, // because we insert an item in listTransformer
+                        count = PAGE_COUNT,
+                        itemTransformer = bookTransformer,
+                        listTransformer = if (offset == 0) bookListTransformer else null,
+                        callback = callback)
         }.execute()
     }
 
@@ -207,6 +223,11 @@ class ListFragment : Fragment() {
     }
 
     private fun Context.showError(result: Result<*>) {
+        if (!isNetworkConnected()) {
+            toast("Please check your network.")
+            return
+        }
+
         when (result.resolveError()) {
             Error.ERROR_NETWORK_CONNECTIVITY -> toast("Please check your network.\n${result.errorMsg}")
             Error.ERROR_DATA_FORMAT -> toast("Something wrong at data side.\n${result.errorMsg}")

@@ -1,6 +1,5 @@
 package tw.kaneshih.kanetest.task
 
-import tw.kaneshih.base.task.CallbackTask
 import tw.kaneshih.base.task.Result
 import tw.kaneshih.kanetest.model.Card
 import tw.kaneshih.kanetest.model.toCardList
@@ -9,14 +8,18 @@ import tw.kaneshih.base.viewholder.ItemViewModel
 
 class CardListFetcher(private val offset: Int,
                       private val count: Int,
-                      private val transformer: (index: Int, card: Card) -> ItemViewModel,
+                      itemTransformer: (index: Int, card: Card) -> ItemViewModel,
+                      listTransformer: ((list: List<ItemViewModel>) -> List<ItemViewModel>)?,
                       callback: (Result<List<ItemViewModel>>) -> Unit)
-    : CallbackTask<List<ItemViewModel>>("CardListFetcher[$offset,$count]", callback) {
+    : TransformCallbackTask<Card>("CardListFetcher[$offset,$count]", callback,
+        itemTransformer, listTransformer) {
 
-    override fun doInBackground(): Result<List<ItemViewModel>> {
+    override fun getRawDataList(): List<Card> {
         val jResult = DataSource.getCardList(offset, count)
-        val cardList = jResult.getJSONArray("result").toCardList()
-        return resultSuccess(
-                cardList.mapIndexed { index, card -> transformer(offset + index, card) })
+        return jResult.getJSONArray("result").toCardList()
+    }
+
+    override fun convertIndex(index: Int): Int {
+        return offset + index
     }
 }

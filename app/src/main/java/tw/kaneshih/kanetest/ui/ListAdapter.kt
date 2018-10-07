@@ -14,6 +14,8 @@ import tw.kaneshih.kanetest.viewholder.LargeItemVH
 import tw.kaneshih.kanetest.viewholder.LargeItemViewModel
 import tw.kaneshih.kanetest.viewholder.MediumItemVH
 import tw.kaneshih.kanetest.viewholder.MediumItemViewModel
+import tw.kaneshih.kanetest.viewholder.TextItemVH
+import tw.kaneshih.kanetest.viewholder.TextViewModel
 
 class ListAdapter(
         private val onItemClickListener: (itemViewModel: ItemViewModel) -> Unit,
@@ -24,6 +26,7 @@ class ListAdapter(
         const val VIEW_TYPE_LARGE_CENTERED = 1
         const val VIEW_TYPE_MEDIUM_LEFT_IMAGE = 2
         const val VIEW_TYPE_MEDIUM_RIGHT_IMAGE = 3
+        const val VIEW_TYPE_GROUP_TITLE = 4
     }
 
     private val list = mutableListOf<ItemViewModel>()
@@ -48,7 +51,7 @@ class ListAdapter(
         } else {
             val viewModel = list[position]
             when (viewModel) {
-                is MediumItemViewModel -> when (viewModel.data) {
+                is MediumItemViewModel -> when (viewModel.userData) {
                     is Card -> VIEW_TYPE_MEDIUM_LEFT_IMAGE
                     is Book -> {
                         if (position % 2 == 0) VIEW_TYPE_MEDIUM_RIGHT_IMAGE
@@ -57,6 +60,7 @@ class ListAdapter(
                     else -> VIEW_TYPE_MEDIUM_LEFT_IMAGE
                 }
                 is LargeItemViewModel -> VIEW_TYPE_LARGE_CENTERED
+                is TextViewModel -> VIEW_TYPE_GROUP_TITLE
                 else -> VIEW_TYPE_MEDIUM_LEFT_IMAGE
             }
         }
@@ -78,6 +82,10 @@ class ListAdapter(
                 MediumItemVH(LayoutInflater.from(parent.context)
                         .inflate(R.layout.item_medium_right_image, parent, false),
                         onItemClickListener, onItemThumbnailClickListener)
+
+            VIEW_TYPE_GROUP_TITLE ->
+                TextItemVH(LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_group_title, parent, false))
 
             else -> BasicVH<ItemViewModel>(LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_load, parent, false))

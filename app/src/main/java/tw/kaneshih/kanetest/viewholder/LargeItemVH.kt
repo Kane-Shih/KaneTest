@@ -4,16 +4,16 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import tw.kaneshih.base.viewholder.BasicVH
-import tw.kaneshih.base.viewholder.ItemViewModel
+import tw.kaneshih.base.viewholder.BasicVM
 import tw.kaneshih.kanetest.R
 import tw.kaneshih.kanetest.model.Card
 import tw.kaneshih.kanetest.glide.GlideApp
 import tw.kaneshih.kanetest.model.Book
 
 class LargeItemVH(itemView: View,
-                  itemClickListener: (viewHolder: BasicVH<*>, itemViewModel: ItemViewModel) -> Unit,
-                  thumbnailClickListener: (viewHolder: BasicVH<*>, itemViewModel: ItemViewModel) -> Unit
-) : BasicVH<LargeItemViewModel>(itemView) {
+                  itemClickListener: (viewHolder: BasicVH<*>, basicVM: BasicVM) -> Unit,
+                  thumbnailClickListener: (viewHolder: BasicVH<*>, basicVM: BasicVM) -> Unit
+) : BasicVH<LargeItemVM>(itemView) {
     private val image: ImageView = itemView.findViewById(R.id.image)
     private val title: TextView = itemView.findViewById(R.id.title)
     private val count: TextView = itemView.findViewById(R.id.count)
@@ -23,9 +23,9 @@ class LargeItemVH(itemView: View,
         image.setOnClickListener { thumbnailClickListener(this, viewModel) }
     }
 
-    private lateinit var viewModel: LargeItemViewModel
+    private lateinit var viewModel: LargeItemVM
 
-    override fun bind(viewModel: LargeItemViewModel) {
+    override fun bind(viewModel: LargeItemVM) {
         this.viewModel = viewModel
 
         GlideApp.with(image.context)
@@ -40,15 +40,15 @@ class LargeItemVH(itemView: View,
     }
 }
 
-class LargeItemViewModel(
+class LargeItemVM(
         val title: String,
         val imageUrl: String,
         val count: String,
         val url: String)
-    : ItemViewModel()
+    : BasicVM()
 
-fun Card.toLargeItemViewModel(): LargeItemViewModel {
-    return LargeItemViewModel(
+fun Card.toLargeItemViewModel(): LargeItemVM {
+    return LargeItemVM(
             title = this.name,
             imageUrl = this.thumbnail,
             count = "${this.subItemCount}",
@@ -57,8 +57,8 @@ fun Card.toLargeItemViewModel(): LargeItemViewModel {
     }
 }
 
-fun Book.toLargeItemViewModel(ranking: Int): LargeItemViewModel {
-    return LargeItemViewModel(
+fun Book.toLargeItemViewModel(ranking: Int): LargeItemVM {
+    return LargeItemVM(
             title = this.title,
             imageUrl = this.thumbnail,
             count = "$ranking",

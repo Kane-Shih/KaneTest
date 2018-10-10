@@ -1,7 +1,6 @@
 package tw.kaneshih.kanetest.ui
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
@@ -9,11 +8,9 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.net.toUri
 import androidx.core.widget.toast
 import kotlinx.android.synthetic.main.layout_refresher_recyclerview.*
 import tw.kaneshih.base.isNetworkConnected
-import tw.kaneshih.base.log.logDebug
 import tw.kaneshih.base.log.logcat
 import tw.kaneshih.base.recyclerview.LoadMoreAdapter
 import tw.kaneshih.base.task.Result
@@ -26,10 +23,10 @@ import tw.kaneshih.kanetest.task.BookListFetcher
 import tw.kaneshih.kanetest.task.CardListFetcher
 import tw.kaneshih.kanetest.task.Error
 import tw.kaneshih.kanetest.task.resolveError
-import tw.kaneshih.base.viewholder.ItemViewModel
-import tw.kaneshih.kanetest.viewholder.LargeItemViewModel
-import tw.kaneshih.kanetest.viewholder.MediumItemViewModel
-import tw.kaneshih.kanetest.viewholder.TextViewModel
+import tw.kaneshih.base.viewholder.BasicVM
+import tw.kaneshih.kanetest.viewholder.LargeItemVM
+import tw.kaneshih.kanetest.viewholder.MediumItemVM
+import tw.kaneshih.kanetest.viewholder.TextVM
 import tw.kaneshih.kanetest.viewholder.toLargeItemViewModel
 import tw.kaneshih.kanetest.viewholder.toMediumItemViewModel
 import java.lang.RuntimeException
@@ -68,7 +65,7 @@ class ListFragment : Fragment() {
 
     private var canLoadMore = true
 
-    private lateinit var adapter: LoadMoreAdapter<*, ItemViewModel>
+    private lateinit var adapter: LoadMoreAdapter<*, BasicVM>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,18 +83,18 @@ class ListFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = ListAdapter()
                 .apply {
-                    onItemClickListener = { viewHolder: BasicVH<*>, item: ItemViewModel ->
+                    onItemClickListener = { viewHolder: BasicVH<*>, item: BasicVM ->
                         val vPos = recyclerView.getChildAdapterPosition(viewHolder.getView())
                         when (item) {
-                            is LargeItemViewModel -> item.url
-                            is MediumItemViewModel -> item.url
+                            is LargeItemVM -> item.url
+                            is MediumItemVM -> item.url
                             else -> null
                         }?.let {
                             //context?.startActivity(Intent(Intent.ACTION_VIEW, it.toUri()))
                             context?.toast("itemClicked @ dataPos${item.extra.getInt(USERDATA_KEY_INDEX)} / vPos:$vPos")
                         }
                     }
-                    onItemThumbnailClickListener = { viewHolder: BasicVH<*>, item: ItemViewModel ->
+                    onItemThumbnailClickListener = { viewHolder: BasicVH<*>, item: BasicVM ->
                         val vPos = recyclerView.getChildAdapterPosition(viewHolder.getView())
                         val data = item.userData
                         when (data) {
@@ -154,13 +151,13 @@ class ListFragment : Fragment() {
                 extra.putInt(USERDATA_KEY_INDEX, index)
             }
 
-    private fun transformFirstPageBookList(list: List<ItemViewModel>): List<ItemViewModel> {
+    private fun transformFirstPageBookList(list: List<BasicVM>): List<BasicVM> {
         return list.toMutableList().apply {
-            add(4, TextViewModel(">> Medium layout below"))
+            add(4, TextVM(">> Medium layout below"))
         }
     }
 
-    private fun startFetcher(offset: Int, callback: (Result<List<ItemViewModel>>) -> Unit) {
+    private fun startFetcher(offset: Int, callback: (Result<List<BasicVM>>) -> Unit) {
         when (listType) {
             ListType.CARDS ->
                 CardListFetcher(
@@ -185,7 +182,7 @@ class ListFragment : Fragment() {
         (activity as? Host)?.onUpdateTitle("fetching list of $listType")
     }
 
-    private fun onRefresh(result: Result<List<ItemViewModel>>) {
+    private fun onRefresh(result: Result<List<BasicVM>>) {
         val context = if (isAdded && !isRemoving) context ?: return else return
 
         canLoadMore = if (result.isSuccess) {
@@ -210,7 +207,7 @@ class ListFragment : Fragment() {
         (activity as? Host)?.onUpdateTitle("appending list of $listType, offset: $offset")
     }
 
-    private fun onLoadMore(result: Result<List<ItemViewModel>>) {
+    private fun onLoadMore(result: Result<List<BasicVM>>) {
         val context = if (isAdded && !isRemoving) context ?: return else return
 
         canLoadMore = if (result.isSuccess) {

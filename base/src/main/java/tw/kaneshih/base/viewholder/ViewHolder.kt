@@ -8,7 +8,7 @@ interface ViewHolder<in VM : ViewModel> {
     fun getView(): View
 }
 
-open class BasicVH<in VM : ItemViewModel>(private val view: View)
+open class BasicVH<in VM : BasicVM>(private val view: View)
     : ViewHolder<VM> {
     override fun getView() = view
 
@@ -17,5 +17,5 @@ open class BasicVH<in VM : ItemViewModel>(private val view: View)
     }
 }
 
-class RecyclerVH<in VM : ItemViewModel>(val viewHolder: BasicVH<VM>)
+class RecyclerVH<in VM : BasicVM>(val viewHolder: BasicVH<VM>)
     : RecyclerView.ViewHolder(viewHolder.getView())

@@ -6,7 +6,7 @@ interface ViewModel {
     val extra: Bundle
 }
 
-abstract class ItemViewModel : ViewModel {
+abstract class BasicVM : ViewModel {
     override val extra by lazy { Bundle() }
 
     var userData: Any? = null

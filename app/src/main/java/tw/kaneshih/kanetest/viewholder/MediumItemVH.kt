@@ -5,16 +5,16 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import tw.kaneshih.base.viewholder.BasicVH
-import tw.kaneshih.base.viewholder.ItemViewModel
+import tw.kaneshih.base.viewholder.BasicVM
 import tw.kaneshih.kanetest.R
 import tw.kaneshih.kanetest.model.Card
 import tw.kaneshih.kanetest.glide.GlideApp
 import tw.kaneshih.kanetest.model.Book
 
 class MediumItemVH(itemView: View,
-                   itemClickListener: (viewHolder: BasicVH<*>, itemViewModel: ItemViewModel) -> Unit,
-                   thumbnailClickListener: (viewHolder: BasicVH<*>, itemViewModel: ItemViewModel) -> Unit
-) : BasicVH<MediumItemViewModel>(itemView) {
+                   itemClickListener: (viewHolder: BasicVH<*>, basicVM: BasicVM) -> Unit,
+                   thumbnailClickListener: (viewHolder: BasicVH<*>, basicVM: BasicVM) -> Unit
+) : BasicVH<MediumItemVM>(itemView) {
     private val image: ImageView = itemView.findViewById(R.id.image)
     private val title: TextView = itemView.findViewById(R.id.title)
     private val count: TextView = itemView.findViewById(R.id.count)
@@ -25,9 +25,9 @@ class MediumItemVH(itemView: View,
         image.setOnClickListener { thumbnailClickListener(this, viewModel) }
     }
 
-    private lateinit var viewModel: MediumItemViewModel
+    private lateinit var viewModel: MediumItemVM
 
-    override fun bind(viewModel: MediumItemViewModel) {
+    override fun bind(viewModel: MediumItemVM) {
         this.viewModel = viewModel
 
         GlideApp.with(image.context)
@@ -43,16 +43,16 @@ class MediumItemVH(itemView: View,
     }
 }
 
-class MediumItemViewModel(
+class MediumItemVM(
         val title: String,
         val imageUrl: String,
         val count: String,
         val desc: String,
         val url: String)
-    : ItemViewModel()
+    : BasicVM()
 
-fun Card.toMediumItemViewModel(context: Context?): MediumItemViewModel {
-    return MediumItemViewModel(
+fun Card.toMediumItemViewModel(context: Context?): MediumItemVM {
+    return MediumItemVM(
             title = context?.getString(R.string.card_name_formatter, this.name)
                     ?: this.name,
             imageUrl = this.thumbnail,
@@ -64,8 +64,8 @@ fun Card.toMediumItemViewModel(context: Context?): MediumItemViewModel {
     }
 }
 
-fun Book.toMediumItemViewModel(context: Context?): MediumItemViewModel {
-    return MediumItemViewModel(
+fun Book.toMediumItemViewModel(context: Context?): MediumItemVM {
+    return MediumItemVM(
             title = context?.getString(R.string.book_title_formatter, this.title)
                     ?: this.title,
             imageUrl = this.thumbnail,

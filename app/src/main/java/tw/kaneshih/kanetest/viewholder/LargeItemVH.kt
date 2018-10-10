@@ -47,23 +47,23 @@ class LargeItemVM(
         val url: String)
     : BasicVM()
 
-fun Card.toLargeItemViewModel(): LargeItemVM {
+fun Card.toLargeItemVM(): LargeItemVM {
     return LargeItemVM(
             title = this.name,
             imageUrl = this.thumbnail,
             count = "${this.subItemCount}",
             url = this.url).apply {
-        userData = this@toLargeItemViewModel
+        userData = this@toLargeItemVM
     }
 }
 
-fun Book.toLargeItemViewModel(ranking: Int): LargeItemVM {
+fun Book.toLargeItemVM(ranking: Int): LargeItemVM {
     return LargeItemVM(
             title = this.title,
             imageUrl = this.thumbnail,
             count = "$ranking",
             url = this.url
     ).apply {
-        userData = this@toLargeItemViewModel
+        userData = this@toLargeItemVM
     }
 }

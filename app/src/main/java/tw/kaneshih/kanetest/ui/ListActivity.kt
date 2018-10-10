@@ -22,6 +22,11 @@ class ListActivity : AppCompatActivity(), ListFragment.Host {
                 Intent(context, ListActivity::class.java).apply {
                     putExtra(EXTRA_ARGS, ListFragment.createArgsForBooks())
                 }
+
+        fun getIntentForMixed(context: Context) =
+                Intent(context, ListActivity::class.java).apply {
+                    putExtra(EXTRA_ARGS, ListFragment.createArgsForMixed())
+                }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -5,9 +5,6 @@ import android.net.ConnectivityManager
 import android.support.annotation.DrawableRes
 import android.util.TypedValue
 import android.view.View
-import tw.kaneshih.base.task.Result
-
-const val LOG_TAG = "Kane"
 
 @DrawableRes
 fun Context.getSelectableItemBackground() =

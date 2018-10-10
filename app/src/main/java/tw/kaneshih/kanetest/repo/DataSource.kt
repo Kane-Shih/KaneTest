@@ -1,5 +1,7 @@
 package tw.kaneshih.kanetest.repo
 
+import android.os.Looper
+import android.os.NetworkOnMainThreadException
 import android.os.SystemClock
 import org.json.JSONArray
 import org.json.JSONObject
@@ -28,6 +30,7 @@ object DataSource { // simulate
             "https://github.com")
 
     fun getCardList(offset: Int, count: Int): JSONObject {
+        requireBackgroundThread()
         SystemClock.sleep(SLEEP_TIME_MS)
 
         val random = Random()
@@ -55,6 +58,7 @@ object DataSource { // simulate
     }
 
     fun getBookList(offset: Int, count: Int): JSONObject {
+        requireBackgroundThread()
         SystemClock.sleep(SLEEP_TIME_MS)
 
         val jArray = JSONArray()
@@ -78,5 +82,11 @@ object DataSource { // simulate
         val jResult = JSONObject()
         jResult.put("result", jArray)
         return jResult
+    }
+
+    private fun requireBackgroundThread() {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            throw NetworkOnMainThreadException()
+        }
     }
 }

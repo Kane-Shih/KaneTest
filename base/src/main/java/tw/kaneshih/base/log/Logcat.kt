@@ -1,8 +1,9 @@
 package tw.kaneshih.base.log
 
 import tw.kaneshih.base.BaseConfig
-import tw.kaneshih.base.LOG_TAG
 import tw.kaneshih.base.task.Result
+
+const val LOG_TAG = "Kane"
 
 interface Logcat {
     fun logDebug(tag: String, msg: Any?)

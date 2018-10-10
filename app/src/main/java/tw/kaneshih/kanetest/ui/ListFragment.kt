@@ -24,17 +24,24 @@ import tw.kaneshih.kanetest.task.CardListFetcher
 import tw.kaneshih.kanetest.task.Error
 import tw.kaneshih.kanetest.task.resolveError
 import tw.kaneshih.base.viewholder.BasicVM
+import tw.kaneshih.kanetest.model.toBookList
+import tw.kaneshih.kanetest.repo.DataSource
 import tw.kaneshih.kanetest.viewholder.LargeItemVM
+import tw.kaneshih.kanetest.viewholder.ListVM
 import tw.kaneshih.kanetest.viewholder.MediumItemVM
+import tw.kaneshih.kanetest.viewholder.SmallItemVH
+import tw.kaneshih.kanetest.viewholder.SmallItemVM
 import tw.kaneshih.kanetest.viewholder.TextVM
-import tw.kaneshih.kanetest.viewholder.toLargeItemViewModel
-import tw.kaneshih.kanetest.viewholder.toMediumItemViewModel
+import tw.kaneshih.kanetest.viewholder.toLargeItemVM
+import tw.kaneshih.kanetest.viewholder.toMediumItemVM
+import tw.kaneshih.kanetest.viewholder.toSmallItemVM
 import java.lang.RuntimeException
 
 class ListFragment : Fragment() {
     companion object {
         const val PAGE_COUNT = 20
         const val LOAD_MORE_THRESHOLD = 5
+        const val CAROUSEL_COUNT = 20
 
         const val USERDATA_KEY_INDEX = "index"
 
@@ -51,6 +58,10 @@ class ListFragment : Fragment() {
         fun createArgsForBooks() = Bundle().apply {
             putString(ARGS_TYPE, ListType.BOOKS.name)
         }
+
+        fun createArgsForMixed() = Bundle().apply {
+            putString(ARGS_TYPE, ListType.MIXED.name)
+        }
     }
 
     interface Host {
@@ -58,7 +69,7 @@ class ListFragment : Fragment() {
     }
 
     private enum class ListType {
-        BOOKS, CARDS
+        BOOKS, CARDS, MIXED
     }
 
     private lateinit var listType: ListType
@@ -88,6 +99,10 @@ class ListFragment : Fragment() {
                         when (item) {
                             is LargeItemVM -> item.url
                             is MediumItemVM -> item.url
+                            is SmallItemVM -> {
+                                context?.toast("carousel[${item.extra.getInt(USERDATA_KEY_INDEX)}] ${item.title} is clicked")
+                                null
+                            }
                             else -> null
                         }?.let {
                             //context?.startActivity(Intent(Intent.ACTION_VIEW, it.toUri()))
@@ -136,17 +151,17 @@ class ListFragment : Fragment() {
 
     private fun transformCard(index: Int, card: Card) =
             when (card.type) {
-                CardType.LARGE -> card.toLargeItemViewModel()
-                CardType.MEDIUM -> card.toMediumItemViewModel(context)
+                CardType.LARGE -> card.toLargeItemVM()
+                CardType.MEDIUM -> card.toMediumItemVM(context)
             }.apply {
                 extra.putInt(USERDATA_KEY_INDEX, index)
             }
 
     private fun transformBook(index: Int, book: Book) =
             if (index < 4) {
-                book.toLargeItemViewModel(index + 1)
+                book.toLargeItemVM(index + 1)
             } else {
-                book.toMediumItemViewModel(context)
+                book.toMediumItemVM(context)
             }.apply {
                 extra.putInt(USERDATA_KEY_INDEX, index)
             }
@@ -173,6 +188,34 @@ class ListFragment : Fragment() {
                         itemTransformer = ::transformBook,
                         listTransformer = if (offset == 0) ::transformFirstPageBookList else null,
                         callback = callback)
+            ListType.MIXED -> {
+                if (offset == 0) {
+                    CardListFetcher(
+                            offset = 0,
+                            count = CAROUSEL_COUNT,
+                            itemTransformer = { index, card ->
+                                card.toSmallItemVM().apply { extra.putInt(USERDATA_KEY_INDEX, index) }
+                            },
+                            listTransformer = { list ->
+                                // here not only transform, but also fetch another list to merge
+                                val listVM = ListVM(list) // CardListFetcher's result
+                                val bookList = DataSource.getBookList(0, PAGE_COUNT)
+                                        .getJSONArray("result")
+                                        .toBookList()
+                                        .mapIndexed { index, book ->
+                                            book.toMediumItemVM(context).apply { extra.putInt(USERDATA_KEY_INDEX, index) }
+                                        }
+                                mutableListOf<BasicVM>().apply {
+                                    add(listVM)
+                                    addAll(bookList)
+                                }
+                            },
+                            callback = callback)
+                } else {
+                    // minus one because of the carousel header
+                    BookListFetcher(offset - 1, PAGE_COUNT, ::transformBook, null, callback)
+                }
+            }
         }.execute()
     }
 

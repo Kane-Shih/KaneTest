@@ -51,7 +51,7 @@ class MediumItemVM(
         val url: String)
     : BasicVM()
 
-fun Card.toMediumItemViewModel(context: Context?): MediumItemVM {
+fun Card.toMediumItemVM(context: Context?): MediumItemVM {
     return MediumItemVM(
             title = context?.getString(R.string.card_name_formatter, this.name)
                     ?: this.name,
@@ -60,11 +60,11 @@ fun Card.toMediumItemViewModel(context: Context?): MediumItemVM {
                     ?: "${this.subItemCount}",
             desc = this.description,
             url = this.url).apply {
-        userData = this@toMediumItemViewModel
+        userData = this@toMediumItemVM
     }
 }
 
-fun Book.toMediumItemViewModel(context: Context?): MediumItemVM {
+fun Book.toMediumItemVM(context: Context?): MediumItemVM {
     return MediumItemVM(
             title = context?.getString(R.string.book_title_formatter, this.title)
                     ?: this.title,
@@ -73,6 +73,6 @@ fun Book.toMediumItemViewModel(context: Context?): MediumItemVM {
             desc = context?.getString(R.string.book_desc_formatter, this.authorName, this.publishYear, this.description)
                     ?: this.description,
             url = this.url).apply {
-        userData = this@toMediumItemViewModel
+        userData = this@toMediumItemVM
     }
 }

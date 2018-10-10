@@ -29,6 +29,11 @@ class MainActivity : AppCompatActivity() {
                 text = "Click for Books"
                 onClick { startActivity(ListActivity.getIntentForBooks(context)) }
             }
+
+            addItem {
+                text = "Click for Mixed"
+                onClick { startActivity(ListActivity.getIntentForMixed(context)) }
+            }
         })
     }
 

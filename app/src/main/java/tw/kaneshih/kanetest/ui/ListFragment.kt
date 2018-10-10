@@ -19,17 +19,15 @@ import tw.kaneshih.kanetest.R
 import tw.kaneshih.kanetest.model.Book
 import tw.kaneshih.kanetest.model.Card
 import tw.kaneshih.kanetest.model.CardType
-import tw.kaneshih.kanetest.task.BookListFetcher
-import tw.kaneshih.kanetest.task.CardListFetcher
 import tw.kaneshih.kanetest.task.Error
 import tw.kaneshih.kanetest.task.resolveError
 import tw.kaneshih.base.viewholder.BasicVM
-import tw.kaneshih.kanetest.model.toBookList
-import tw.kaneshih.kanetest.repo.DataSource
+import tw.kaneshih.kanetest.fetcher.BookListFetcher
+import tw.kaneshih.kanetest.fetcher.CardListFetcher
+import tw.kaneshih.kanetest.task.FetcherTask
 import tw.kaneshih.kanetest.viewholder.LargeItemVM
 import tw.kaneshih.kanetest.viewholder.ListVM
 import tw.kaneshih.kanetest.viewholder.MediumItemVM
-import tw.kaneshih.kanetest.viewholder.SmallItemVH
 import tw.kaneshih.kanetest.viewholder.SmallItemVM
 import tw.kaneshih.kanetest.viewholder.TextVM
 import tw.kaneshih.kanetest.viewholder.toLargeItemVM
@@ -172,48 +170,55 @@ class ListFragment : Fragment() {
         }
     }
 
+    private fun transformCarouselCard(index: Int, card: Card) =
+            card.toSmallItemVM().apply { extra.putInt(USERDATA_KEY_INDEX, index) }
+
+    private fun mergeCarouselAndBookList(list: List<BasicVM>): List<BasicVM> {
+        val listVM = ListVM(list) // CardListTask's result
+        val bookList = BookListFetcher(0, PAGE_COUNT).fetch()
+                .mapIndexed { index, book ->
+                    book.toMediumItemVM(context).apply { extra.putInt(USERDATA_KEY_INDEX, index) }
+                }
+        return mutableListOf<BasicVM>().apply {
+            add(listVM)
+            addAll(bookList)
+        }
+    }
+
     private fun startFetcher(offset: Int, callback: (Result<List<BasicVM>>) -> Unit) {
         when (listType) {
             ListType.CARDS ->
-                CardListFetcher(
-                        offset = offset,
-                        count = PAGE_COUNT,
-                        itemTransformer = ::transformCard,
-                        listTransformer = null,
+                FetcherTask(
+                        name = "CardTask-$offset",
+                        fetcher = CardListFetcher(offset, PAGE_COUNT),
+                        mapIndexed = ::transformCard,
+                        resultCreator = null,
                         callback = callback)
             ListType.BOOKS ->
-                BookListFetcher(
-                        offset = if (offset > 0) offset - 1 else offset, // because we insert an item in listTransformer
-                        count = PAGE_COUNT,
-                        itemTransformer = ::transformBook,
-                        listTransformer = if (offset == 0) ::transformFirstPageBookList else null,
+                FetcherTask(
+                        name = "BookTask-$offset",
+                        // offset-1 because we insert an item in listTransformer
+                        fetcher = BookListFetcher(if (offset > 0) offset - 1 else offset, PAGE_COUNT),
+                        mapIndexed = ::transformBook,
+                        resultCreator = if (offset == 0) ::transformFirstPageBookList else null,
                         callback = callback)
             ListType.MIXED -> {
                 if (offset == 0) {
-                    CardListFetcher(
-                            offset = 0,
-                            count = CAROUSEL_COUNT,
-                            itemTransformer = { index, card ->
-                                card.toSmallItemVM().apply { extra.putInt(USERDATA_KEY_INDEX, index) }
-                            },
-                            listTransformer = { list ->
-                                // here not only transform, but also fetch another list to merge
-                                val listVM = ListVM(list) // CardListFetcher's result
-                                val bookList = DataSource.getBookList(0, PAGE_COUNT)
-                                        .getJSONArray("result")
-                                        .toBookList()
-                                        .mapIndexed { index, book ->
-                                            book.toMediumItemVM(context).apply { extra.putInt(USERDATA_KEY_INDEX, index) }
-                                        }
-                                mutableListOf<BasicVM>().apply {
-                                    add(listVM)
-                                    addAll(bookList)
-                                }
-                            },
+                    FetcherTask(
+                            name = "MixedTask-0",
+                            fetcher = CardListFetcher(offset, CAROUSEL_COUNT),
+                            mapIndexed = ::transformCarouselCard,
+                            resultCreator = ::mergeCarouselAndBookList,
                             callback = callback)
                 } else {
                     // minus one because of the carousel header
-                    BookListFetcher(offset - 1, PAGE_COUNT, ::transformBook, null, callback)
+                    FetcherTask(
+                            name = "MixedTask-$offset",
+                            fetcher = BookListFetcher(offset - 1, PAGE_COUNT),
+                            mapIndexed = ::transformBook,
+                            resultCreator = null,
+                            callback = callback
+                    )
                 }
             }
         }.execute()

@@ -3,7 +3,7 @@
     package="tw.kaneshih.kanetest">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name=".App"
@@ -22,6 +22,7 @@
         </activity>
 
         <activity android:name="tw.kaneshih.kanetest.ui.ListActivity" />
+        <activity android:name="tw.kaneshih.kanetest.ui.NonListActivity" />
     </application>
 
 </manifest>

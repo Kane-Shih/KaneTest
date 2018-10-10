@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/largeItemView"
+        layout="@layout/item_large_centered"
+        android:visibility="gone" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="12dp" />
+
+    <include
+        android:id="@+id/mediumItemView"
+        layout="@layout/item_medium_left_image"
+        android:visibility="gone" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="12dp" />
+
+    <include
+        android:id="@+id/smallItemView"
+        layout="@layout/item_small"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/loadingView"
+        layout="@layout/item_load" />
+</LinearLayout>

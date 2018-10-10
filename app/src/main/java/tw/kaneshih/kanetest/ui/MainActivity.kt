@@ -1,5 +1,7 @@
 package tw.kaneshih.kanetest.ui
 
+import android.content.Intent
+import android.graphics.Paint
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -21,18 +23,23 @@ class MainActivity : AppCompatActivity() {
                     ViewGroup.LayoutParams.MATCH_PARENT)
 
             addItem {
-                text = "Click for Cards"
+                text = "Card List"
                 onClick { startActivity(ListActivity.getIntentForCards(context)) }
             }
 
             addItem {
-                text = "Click for Books"
+                text = "Book List"
                 onClick { startActivity(ListActivity.getIntentForBooks(context)) }
             }
 
             addItem {
-                text = "Click for Mixed"
+                text = "Mixed List"
                 onClick { startActivity(ListActivity.getIntentForMixed(context)) }
+            }
+
+            addItem {
+                text = "Non-list"
+                onClick { startActivity(Intent(this@MainActivity, NonListActivity::class.java)) }
             }
         })
     }
@@ -42,7 +49,8 @@ class MainActivity : AppCompatActivity() {
             layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT)
-            textSize = 48f
+            textSize = 32f
+            paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
             setPadding(32)
             setSelectableItemBackground()
 

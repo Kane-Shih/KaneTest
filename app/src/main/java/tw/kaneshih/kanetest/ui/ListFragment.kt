@@ -17,6 +17,7 @@ import tw.kaneshih.base.log.logDebug
 import tw.kaneshih.base.log.logcat
 import tw.kaneshih.base.recyclerview.LoadMoreAdapter
 import tw.kaneshih.base.task.Result
+import tw.kaneshih.base.viewholder.BasicVH
 import tw.kaneshih.kanetest.R
 import tw.kaneshih.kanetest.model.Book
 import tw.kaneshih.kanetest.model.Card
@@ -83,8 +84,33 @@ class ListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = ListAdapter(itemClickListener, itemThumbnailClickListener)
-                .also { this.adapter = it }
+        recyclerView.adapter = ListAdapter()
+                .apply {
+                    onItemClickListener = { viewHolder: BasicVH<*>, item: ItemViewModel ->
+                        val vPos = recyclerView.getChildAdapterPosition(viewHolder.getView())
+                        when (item) {
+                            is LargeItemViewModel -> item.url
+                            is MediumItemViewModel -> item.url
+                            else -> null
+                        }?.let {
+                            //context?.startActivity(Intent(Intent.ACTION_VIEW, it.toUri()))
+                            context?.toast("itemClicked @ dataPos${item.extra.getInt(USERDATA_KEY_INDEX)} / vPos:$vPos")
+                        }
+                    }
+                    onItemThumbnailClickListener = { viewHolder: BasicVH<*>, item: ItemViewModel ->
+                        val vPos = recyclerView.getChildAdapterPosition(viewHolder.getView())
+                        val data = item.userData
+                        when (data) {
+                            is Card -> "Card[${data.id}] ${data.name} @ dataPos${item.extra.getInt(USERDATA_KEY_INDEX)} / vPos:$vPos"
+                            is Book -> "Book[${data.id}] ${data.title} @ dataPos${item.extra.getInt(USERDATA_KEY_INDEX)} / vPos:$vPos"
+                            else -> null
+                        }?.let {
+                            context?.toast("image of $it is clicked!")
+                        }
+                    }
+                }.also {
+                    this.adapter = it
+                }
         recyclerView.addOnScrollListener(onScrollListener)
         refresher.setOnRefreshListener { refresh() }
 
@@ -111,64 +137,44 @@ class ListFragment : Fragment() {
         }
     }
 
-    private val cardTransformer = { index: Int, card: Card ->
-        when (card.type) {
-            CardType.LARGE -> card.toLargeItemViewModel()
-            CardType.MEDIUM -> card.toMediumItemViewModel(context)
-        }.apply {
-            extra.putInt(USERDATA_KEY_INDEX, index)
-        }
-    }
+    private fun transformCard(index: Int, card: Card) =
+            when (card.type) {
+                CardType.LARGE -> card.toLargeItemViewModel()
+                CardType.MEDIUM -> card.toMediumItemViewModel(context)
+            }.apply {
+                extra.putInt(USERDATA_KEY_INDEX, index)
+            }
 
-    private val bookTransformer = { index: Int, book: Book ->
-        if (index < 4) {
-            book.toLargeItemViewModel(index + 1)
-        } else {
-            book.toMediumItemViewModel(context)
-        }.apply {
-            extra.putInt(USERDATA_KEY_INDEX, index)
-        }
-    }
+    private fun transformBook(index: Int, book: Book) =
+            if (index < 4) {
+                book.toLargeItemViewModel(index + 1)
+            } else {
+                book.toMediumItemViewModel(context)
+            }.apply {
+                extra.putInt(USERDATA_KEY_INDEX, index)
+            }
 
-    private val bookListTransformer = { list: List<ItemViewModel> ->
-        list.toMutableList().apply {
+    private fun transformFirstPageBookList(list: List<ItemViewModel>): List<ItemViewModel> {
+        return list.toMutableList().apply {
             add(4, TextViewModel(">> Medium layout below"))
-        }
-    }
-
-    private val itemClickListener: (ItemViewModel) -> Unit = { item ->
-        when (item) {
-            is LargeItemViewModel -> item.url
-            is MediumItemViewModel -> item.url
-            else -> null
-        }?.let {
-            context?.startActivity(Intent(Intent.ACTION_VIEW, it.toUri()))
-            "itemClicked @row${item.extra.getInt(USERDATA_KEY_INDEX)}".logDebug()
-        }
-    }
-
-    private val itemThumbnailClickListener: (ItemViewModel) -> Unit = { item ->
-        val data = item.userData
-        when (data) {
-            is Card -> "Card[${data.id}] ${data.name} @ row${item.extra.getInt(USERDATA_KEY_INDEX)}"
-            is Book -> "Book[${data.id}] ${data.title} @ row${item.extra.getInt(USERDATA_KEY_INDEX)}"
-            else -> null
-        }?.let {
-            context?.toast("image of $it is clicked!")
         }
     }
 
     private fun startFetcher(offset: Int, callback: (Result<List<ItemViewModel>>) -> Unit) {
         when (listType) {
-            ListType.CARDS -> CardListFetcher(offset, PAGE_COUNT,
-                    cardTransformer, null,
-                    callback)
+            ListType.CARDS ->
+                CardListFetcher(
+                        offset = offset,
+                        count = PAGE_COUNT,
+                        itemTransformer = ::transformCard,
+                        listTransformer = null,
+                        callback = callback)
             ListType.BOOKS ->
                 BookListFetcher(
                         offset = if (offset > 0) offset - 1 else offset, // because we insert an item in listTransformer
                         count = PAGE_COUNT,
-                        itemTransformer = bookTransformer,
-                        listTransformer = if (offset == 0) bookListTransformer else null,
+                        itemTransformer = ::transformBook,
+                        listTransformer = if (offset == 0) ::transformFirstPageBookList else null,
                         callback = callback)
         }.execute()
     }
@@ -229,9 +235,9 @@ class ListFragment : Fragment() {
         }
 
         when (result.resolveError()) {
-            Error.ERROR_NETWORK_CONNECTIVITY -> toast("Please check your network.\n${result.errorMsg}")
-            Error.ERROR_DATA_FORMAT -> toast("Something wrong at data side.\n${result.errorMsg}")
-            Error.ERROR_OTHERS -> toast("Mystery error happened.\n${result.errorMsg}")
+            Error.ERROR_NETWORK_CONNECTIVITY -> toast("Please check your network.\n${result.exception?.message}")
+            Error.ERROR_DATA_FORMAT -> toast("Something wrong at data side.\n${result.exception?.message}")
+            Error.ERROR_OTHERS -> toast("Mystery error happened.\n${result.exception?.message}")
             Error.NO_ERROR -> return
         }
     }

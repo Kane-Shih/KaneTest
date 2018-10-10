@@ -26,15 +26,13 @@ fun Throwable?.logError(tag: String = LOG_TAG, msg: String? = null) {
     BaseConfig.logcat.logError(tag, msg ?: "ERROR", this)
 }
 
-fun Result<*>?.logcat(tag: String = LOG_TAG) {
+fun Result<*>.logcat(tag: String = LOG_TAG) {
     when {
-        this == null ->
-            "Result is null".logError(tag)
         isSuccess ->
             "$taskName's Result SUCCESS: $data".logDebug(tag)
         else ->
             exception.logError(
                     tag = tag,
-                    msg = "$taskName's Result FAILED: $errorMsg")
+                    msg = "$taskName's Result FAILED")
     }
 }

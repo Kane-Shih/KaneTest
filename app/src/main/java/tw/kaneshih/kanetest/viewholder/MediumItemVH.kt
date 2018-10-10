@@ -4,25 +4,25 @@ import android.content.Context
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import tw.kaneshih.base.viewholder.BasicVH
 import tw.kaneshih.base.viewholder.ItemViewModel
-import tw.kaneshih.base.viewholder.ViewHolder
 import tw.kaneshih.kanetest.R
 import tw.kaneshih.kanetest.model.Card
 import tw.kaneshih.kanetest.glide.GlideApp
 import tw.kaneshih.kanetest.model.Book
 
-class MediumItemVH(private val itemView: View,
-                   itemClickListener: (itemViewModel: ItemViewModel) -> Unit,
-                   thumbnailClickListener: (itemViewModel: ItemViewModel) -> Unit
-) : ViewHolder<MediumItemViewModel> {
+class MediumItemVH(itemView: View,
+                   itemClickListener: (viewHolder: BasicVH<*>, itemViewModel: ItemViewModel) -> Unit,
+                   thumbnailClickListener: (viewHolder: BasicVH<*>, itemViewModel: ItemViewModel) -> Unit
+) : BasicVH<MediumItemViewModel>(itemView) {
     private val image: ImageView = itemView.findViewById(R.id.image)
     private val title: TextView = itemView.findViewById(R.id.title)
     private val count: TextView = itemView.findViewById(R.id.count)
     private val desc: TextView = itemView.findViewById(R.id.desc)
 
     init {
-        itemView.setOnClickListener { itemClickListener(viewModel) }
-        image.setOnClickListener { thumbnailClickListener(viewModel) }
+        itemView.setOnClickListener { itemClickListener(this, viewModel) }
+        image.setOnClickListener { thumbnailClickListener(this, viewModel) }
     }
 
     private lateinit var viewModel: MediumItemViewModel
@@ -41,8 +41,6 @@ class MediumItemVH(private val itemView: View,
         count.text = viewModel.count
         desc.text = viewModel.desc
     }
-
-    override fun getView() = itemView
 }
 
 class MediumItemViewModel(

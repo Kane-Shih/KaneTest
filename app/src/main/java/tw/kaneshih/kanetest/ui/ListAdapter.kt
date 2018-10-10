@@ -2,7 +2,6 @@ package tw.kaneshih.kanetest.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import tw.kaneshih.base.viewholder.ViewHolder
 import tw.kaneshih.base.recyclerview.LoadMoreAdapter
 import tw.kaneshih.base.viewholder.RecyclerVH
 import tw.kaneshih.kanetest.R
@@ -17,16 +16,17 @@ import tw.kaneshih.kanetest.viewholder.MediumItemViewModel
 import tw.kaneshih.kanetest.viewholder.TextItemVH
 import tw.kaneshih.kanetest.viewholder.TextViewModel
 
-class ListAdapter(
-        private val onItemClickListener: (itemViewModel: ItemViewModel) -> Unit,
-        private val onItemThumbnailClickListener: (itemViewModel: ItemViewModel) -> Unit
-) : LoadMoreAdapter<RecyclerVH<ItemViewModel>, ItemViewModel>() {
+class ListAdapter : LoadMoreAdapter<RecyclerVH<ItemViewModel>, ItemViewModel>() {
+
+    lateinit var onItemClickListener: (viewHolder: BasicVH<*>, itemViewModel: ItemViewModel) -> Unit
+    lateinit var onItemThumbnailClickListener: (viewHolder: BasicVH<*>, itemViewModel: ItemViewModel) -> Unit
+
     companion object {
-        const val VIEW_TYPE_LOADING = 0
-        const val VIEW_TYPE_LARGE_CENTERED = 1
-        const val VIEW_TYPE_MEDIUM_LEFT_IMAGE = 2
-        const val VIEW_TYPE_MEDIUM_RIGHT_IMAGE = 3
-        const val VIEW_TYPE_GROUP_TITLE = 4
+        private const val VIEW_TYPE_LOADING = 0
+        private const val VIEW_TYPE_LARGE_CENTERED = 1
+        private const val VIEW_TYPE_MEDIUM_LEFT_IMAGE = 2
+        private const val VIEW_TYPE_MEDIUM_RIGHT_IMAGE = 3
+        private const val VIEW_TYPE_GROUP_TITLE = 4
     }
 
     private val list = mutableListOf<ItemViewModel>()
@@ -91,7 +91,7 @@ class ListAdapter(
                     .inflate(R.layout.item_load, parent, false))
         }
         @Suppress("UNCHECKED_CAST") // just make it to pass compiler ...
-        return RecyclerVH(vh as ViewHolder<ItemViewModel>)
+        return RecyclerVH(vh as BasicVH<ItemViewModel>)
     }
 
     override fun onBindViewHolder(holder: RecyclerVH<ItemViewModel>, position: Int) {

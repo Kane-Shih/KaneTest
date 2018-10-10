@@ -3,24 +3,24 @@ package tw.kaneshih.kanetest.viewholder
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import tw.kaneshih.base.viewholder.BasicVH
 import tw.kaneshih.base.viewholder.ItemViewModel
-import tw.kaneshih.base.viewholder.ViewHolder
 import tw.kaneshih.kanetest.R
 import tw.kaneshih.kanetest.model.Card
 import tw.kaneshih.kanetest.glide.GlideApp
 import tw.kaneshih.kanetest.model.Book
 
-class LargeItemVH(private val itemView: View,
-                  itemClickListener: (itemViewModel: ItemViewModel) -> Unit,
-                  thumbnailClickListener: (itemViewModel: ItemViewModel) -> Unit
-) : ViewHolder<LargeItemViewModel> {
+class LargeItemVH(itemView: View,
+                  itemClickListener: (viewHolder: BasicVH<*>, itemViewModel: ItemViewModel) -> Unit,
+                  thumbnailClickListener: (viewHolder: BasicVH<*>, itemViewModel: ItemViewModel) -> Unit
+) : BasicVH<LargeItemViewModel>(itemView) {
     private val image: ImageView = itemView.findViewById(R.id.image)
     private val title: TextView = itemView.findViewById(R.id.title)
     private val count: TextView = itemView.findViewById(R.id.count)
 
     init {
-        itemView.setOnClickListener { itemClickListener(viewModel) }
-        image.setOnClickListener { thumbnailClickListener(viewModel) }
+        itemView.setOnClickListener { itemClickListener(this, viewModel) }
+        image.setOnClickListener { thumbnailClickListener(this, viewModel) }
     }
 
     private lateinit var viewModel: LargeItemViewModel
@@ -38,8 +38,6 @@ class LargeItemVH(private val itemView: View,
         title.text = viewModel.title
         count.text = viewModel.count
     }
-
-    override fun getView() = itemView
 }
 
 class LargeItemViewModel(

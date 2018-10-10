@@ -13,7 +13,7 @@ abstract class CallbackTask<T>(
         return try {
             doInBackground()
         } catch (e: Throwable) {
-            Result(name, false, e.message, e, null)
+            Result(name, null, e)
         }
     }
 
@@ -22,14 +22,14 @@ abstract class CallbackTask<T>(
     }
 
     protected fun resultSuccess(data: T) =
-            Result(name, true, null, null, data)
+            Result(name, data, null)
 
-    protected fun resultFailed(errorMsg: String?, exception: Throwable?) =
-            Result(name, false, errorMsg ?: exception?.message, exception, null)
+    protected fun resultFailed(exception: Throwable?) =
+            Result(name, null, exception)
 }
 
 data class Result<T>(val taskName: String?,
-                     val isSuccess: Boolean,
-                     val errorMsg: String?,
-                     val exception: Throwable?,
-                     val data: T?)
+                     val data: T?,
+                     val exception: Throwable?) {
+    val isSuccess = data != null
+}

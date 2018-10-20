@@ -8,7 +8,7 @@ import tw.kaneshih.base.viewholder.BasicVH
 import tw.kaneshih.base.viewholder.BasicVM
 import tw.kaneshih.kanetest.R
 import tw.kaneshih.kanetest.model.Card
-import tw.kaneshih.kanetest.glide.GlideApp
+import tw.kaneshih.kanetest.glide.load
 import tw.kaneshih.kanetest.model.Book
 
 class MediumItemVH(itemView: View,
@@ -30,13 +30,7 @@ class MediumItemVH(itemView: View,
     override fun bind(viewModel: MediumItemVM) {
         this.viewModel = viewModel
 
-        GlideApp.with(image.context)
-                .load(viewModel.imageUrl)
-                .centerCrop()
-                .placeholder(android.R.drawable.ic_menu_rotate)
-                .dontAnimate()
-                .into(image)
-
+        image.load(viewModel.imageUrl)
         title.text = viewModel.title
         count.text = viewModel.count
         desc.text = viewModel.desc

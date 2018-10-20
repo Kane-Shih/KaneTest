@@ -24,7 +24,7 @@ import tw.kaneshih.kanetest.task.resolveError
 import tw.kaneshih.base.viewholder.BasicVM
 import tw.kaneshih.kanetest.fetcher.BookListFetcher
 import tw.kaneshih.kanetest.fetcher.CardListFetcher
-import tw.kaneshih.kanetest.task.FetcherTask
+import tw.kaneshih.base.task.FetcherTask
 import tw.kaneshih.kanetest.viewholder.LargeItemVM
 import tw.kaneshih.kanetest.viewholder.ListVM
 import tw.kaneshih.kanetest.viewholder.MediumItemVM
@@ -189,36 +189,29 @@ class ListFragment : Fragment() {
         when (listType) {
             ListType.CARDS ->
                 FetcherTask(
-                        name = "CardTask-$offset",
                         fetcher = CardListFetcher(offset, PAGE_COUNT),
-                        mapIndexed = ::transformCard,
-                        resultCreator = null,
-                        callback = callback)
+                        transformer = ::transformCard)
+                        .callback(callback)
             ListType.BOOKS ->
                 FetcherTask(
-                        name = "BookTask-$offset",
                         // offset-1 because we insert an item in listTransformer
                         fetcher = BookListFetcher(if (offset > 0) offset - 1 else offset, PAGE_COUNT),
-                        mapIndexed = ::transformBook,
-                        resultCreator = if (offset == 0) ::transformFirstPageBookList else null,
-                        callback = callback)
+                        transformer = ::transformBook)
+                        .then(if (offset == 0) ::transformFirstPageBookList else null)
+                        .callback(callback)
             ListType.MIXED -> {
                 if (offset == 0) {
-                    FetcherTask(
-                            name = "MixedTask-0",
+                    FetcherTask<Card, BasicVM>(
                             fetcher = CardListFetcher(offset, CAROUSEL_COUNT),
-                            mapIndexed = ::transformCarouselCard,
-                            resultCreator = ::mergeCarouselAndBookList,
-                            callback = callback)
+                            transformer = ::transformCarouselCard)
+                            .then(::mergeCarouselAndBookList)
+                            .callback(callback)
                 } else {
                     // minus one because of the carousel header
                     FetcherTask(
-                            name = "MixedTask-$offset",
                             fetcher = BookListFetcher(offset - 1, PAGE_COUNT),
-                            mapIndexed = ::transformBook,
-                            resultCreator = null,
-                            callback = callback
-                    )
+                            transformer = ::transformBook)
+                            .callback(callback)
                 }
             }
         }.execute()

@@ -9,7 +9,7 @@ import tw.kaneshih.base.viewholder.BasicVM
 import tw.kaneshih.kanetest.R
 import tw.kaneshih.kanetest.fetcher.CardListFetcher
 import tw.kaneshih.kanetest.model.Card
-import tw.kaneshih.kanetest.task.FetcherTask
+import tw.kaneshih.base.task.FetcherTask
 import tw.kaneshih.kanetest.task.resolveError
 import tw.kaneshih.kanetest.viewholder.LargeItemVH
 import tw.kaneshih.kanetest.viewholder.LargeItemVM
@@ -39,19 +39,18 @@ class NonListActivity : AppCompatActivity() {
                 { _, vm -> toast("medium thumbnail clicked: ${vm.cardName}") })
         smallItemVH = SmallItemVH(smallItemView) { _, vm -> toast("small item clicked: ${vm.cardName}") }
 
-        FetcherTask(
-                fetcher = CardListFetcher(0, 3),
-                mapIndexed = { index, data ->
-                    when (index) {
-                        0 -> data.toLargeItemVM()
-                        1 -> data.toMediumItemVM(this)
-                        else -> data.toSmallItemVM()
-                    }
-                }) {
+        FetcherTask(CardListFetcher(0, 3))
+        { index, data ->
+            when (index) {
+                0 -> data.toLargeItemVM()
+                1 -> data.toMediumItemVM(this)
+                else -> data.toSmallItemVM()
+            }
+        }.callback {
             loadingView.isVisible = false
             if (!it.isSuccess) {
                 toast("Error: ${it.resolveError()} - ${it.exception}")
-                return@FetcherTask
+                return@callback
             }
             it.data!!.forEachIndexed { index, basicVM ->
                 when (index) {

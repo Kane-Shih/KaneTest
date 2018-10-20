@@ -3,9 +3,15 @@ package tw.kaneshih.base.task
 import android.os.AsyncTask
 
 abstract class CallbackTask<T>(
-        private val name: String? = null,
-        private val callback: (Result<T>) -> Unit)
+        private val name: String? = null)
     : AsyncTask<Void, Int, Result<T>>() {
+
+    private var callback: ((Result<T>) -> Unit)? = null
+
+    fun callback(callback: (Result<T>) -> Unit): CallbackTask<T> {
+        this.callback = callback
+        return this
+    }
 
     protected abstract fun doInBackground(): Result<T>
 
@@ -18,7 +24,7 @@ abstract class CallbackTask<T>(
     }
 
     override fun onPostExecute(result: Result<T>) {
-        callback(result)
+        callback?.invoke(result)
     }
 
     protected fun resultSuccess(data: T) =

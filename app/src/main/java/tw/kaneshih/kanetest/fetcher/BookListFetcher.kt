@@ -1,5 +1,6 @@
 package tw.kaneshih.kanetest.fetcher
 
+import tw.kaneshih.base.fetcher.PageFetcher
 import tw.kaneshih.kanetest.model.Book
 import tw.kaneshih.kanetest.model.toBookList
 import tw.kaneshih.kanetest.repo.DataSource

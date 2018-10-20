@@ -1,5 +1,6 @@
 package tw.kaneshih.kanetest.fetcher
 
+import tw.kaneshih.base.fetcher.PageFetcher
 import tw.kaneshih.kanetest.model.Card
 import tw.kaneshih.kanetest.model.toCardList
 import tw.kaneshih.kanetest.repo.DataSource
